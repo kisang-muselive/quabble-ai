@@ -21,16 +21,16 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { WellnessProvider, useWellness } from "@/components/wellness/wellness-provider";
+import { WellnessModal } from "@/components/wellness/wellness-modal";
+import { Button } from "@/components/ui/button";
+import { Sparkles } from "lucide-react";
 
-export const Assistant = () => {
-  const runtime = useChatRuntime({
-    transport: new AssistantChatTransport({
-      api: "/api/chat",
-    }),
-  });
+const AssistantContent = () => {
+  const { isWellnessModalOpen, closeWellnessModal, openWellnessModal } = useWellness();
 
   return (
-    <AssistantRuntimeProvider runtime={runtime}>
+    <>
       <SidebarProvider>
         <div className="flex h-dvh w-full pr-0.5">
           <ThreadListSidebar />
@@ -55,6 +55,17 @@ export const Assistant = () => {
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
+              <div className="ml-auto">
+                <Button
+                  onClick={openWellnessModal}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Wellness
+                </Button>
+              </div>
             </header>
             <div className="flex-1 overflow-hidden">
               <Thread />
@@ -62,6 +73,26 @@ export const Assistant = () => {
           </SidebarInset>
         </div>
       </SidebarProvider>
+      <WellnessModal
+        open={isWellnessModalOpen}
+        onOpenChange={closeWellnessModal}
+      />
+    </>
+  );
+};
+
+export const Assistant = () => {
+  const runtime = useChatRuntime({
+    transport: new AssistantChatTransport({
+      api: "/api/chat",
+    }),
+  });
+
+  return (
+    <AssistantRuntimeProvider runtime={runtime}>
+      <WellnessProvider>
+        <AssistantContent />
+      </WellnessProvider>
     </AssistantRuntimeProvider>
   );
 };

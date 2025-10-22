@@ -20,6 +20,7 @@ import {
 } from "@assistant-ui/react";
 
 import type { FC } from "react";
+import { useState, useEffect } from "react";
 import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
 import * as m from "motion/react-m";
 
@@ -32,6 +33,8 @@ import {
   ComposerAttachments,
   UserMessageAttachments,
 } from "@/components/assistant-ui/attachment";
+import { useWellness } from "@/components/wellness/wellness-provider";
+import { WellnessTrigger } from "@/components/wellness/wellness-trigger";
 
 import { cn } from "@/lib/utils";
 
@@ -118,9 +121,9 @@ const ThreadSuggestions: FC = () => {
     <div className="aui-thread-welcome-suggestions grid w-full gap-2 pb-4 @md:grid-cols-2">
       {[
         {
-          title: "What's the weather",
-          label: "in San Francisco?",
-          action: "What's the weather in San Francisco?",
+          title: "I'm feeling",
+          label: "stressed and anxious",
+          action: "I'm feeling stressed and anxious. Can you help me?",
         },
         {
           title: "Explain React hooks",
@@ -133,9 +136,9 @@ const ThreadSuggestions: FC = () => {
           action: "Write a SQL query to find top customers",
         },
         {
-          title: "Create a meal plan",
-          label: "for healthy weight loss",
-          action: "Create a meal plan for healthy weight loss",
+          title: "Guide me through",
+          label: "a breathing exercise",
+          action: "Guide me through a breathing exercise to help me relax",
         },
       ].map((suggestedAction, index) => (
         <m.div
@@ -171,10 +174,31 @@ const ThreadSuggestions: FC = () => {
 };
 
 const Composer: FC = () => {
+  const { setShouldShowWellnessTrigger } = useWellness();
+
+  const checkForWellnessKeywords = (text: string) => {
+    const lowerText = text.toLowerCase();
+    const wellnessKeywords = [
+      'stress', 'stressed', 'anxious', 'anxiety', 'breathing', 'meditation',
+      'calm', 'relax', 'overwhelmed', 'worried', 'nervous', 'tense', 'panic'
+    ];
+    return wellnessKeywords.some(keyword => lowerText.includes(keyword));
+  };
+
   return (
     <div className="aui-composer-wrapper sticky bottom-0 mx-auto flex w-full max-w-[var(--thread-max-width)] flex-col gap-4 overflow-visible rounded-t-3xl bg-background pb-4 md:pb-6">
       <ThreadScrollToBottom />
-      <ComposerPrimitive.Root className="aui-composer-root relative flex w-full flex-col rounded-3xl border border-border bg-muted px-1 pt-2 shadow-[0_9px_9px_0px_rgba(0,0,0,0.01),0_2px_5px_0px_rgba(0,0,0,0.06)] dark:border-muted-foreground/15">
+      <ComposerPrimitive.Root
+        className="aui-composer-root relative flex w-full flex-col rounded-3xl border border-border bg-muted px-1 pt-2 shadow-[0_9px_9px_0px_rgba(0,0,0,0.01),0_2px_5px_0px_rgba(0,0,0,0.06)] dark:border-muted-foreground/15"
+        onSubmit={(e) => {
+          const form = e.currentTarget as HTMLFormElement;
+          const input = form.querySelector('textarea') as HTMLTextAreaElement;
+          if (input?.value) {
+            const hasWellnessKeywords = checkForWellnessKeywords(input.value);
+            setShouldShowWellnessTrigger(hasWellnessKeywords);
+          }
+        }}
+      >
         <ComposerAttachments />
         <ComposerPrimitive.Input
           placeholder="Send a message..."
@@ -238,6 +262,24 @@ const MessageError: FC = () => {
 };
 
 const AssistantMessage: FC = () => {
+  const { openWellnessModal, shouldShowWellnessTrigger, setShouldShowWellnessTrigger } = useWellness();
+  const [hasShownTrigger, setHasShownTrigger] = useState(false);
+
+  // Show trigger when wellness was detected and we haven't shown it yet for this message
+  useEffect(() => {
+    if (shouldShowWellnessTrigger && !hasShownTrigger) {
+      setHasShownTrigger(true);
+    }
+  }, [shouldShowWellnessTrigger, hasShownTrigger]);
+
+  // Reset when starting a new conversation
+  useEffect(() => {
+    return () => {
+      setHasShownTrigger(false);
+      setShouldShowWellnessTrigger(false);
+    };
+  }, [setShouldShowWellnessTrigger]);
+
   return (
     <MessagePrimitive.Root asChild>
       <div
@@ -252,6 +294,9 @@ const AssistantMessage: FC = () => {
             }}
           />
           <MessageError />
+          {hasShownTrigger && (
+            <WellnessTrigger onClick={openWellnessModal} />
+          )}
         </div>
 
         <div className="aui-assistant-message-footer mt-2 ml-2 flex">
