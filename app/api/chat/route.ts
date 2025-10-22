@@ -17,9 +17,15 @@ export async function POST(req: Request) {
 
   // Check if the last user message suggests wellness needs
   const lastUserMessage = messages.filter(m => m.role === 'user').pop();
-  const shouldSuggestWellness = lastUserMessage &&
-    typeof lastUserMessage.content === 'string' &&
-    detectWellnessIntent(lastUserMessage.content);
+  let shouldSuggestWellness = false;
+  
+  if (lastUserMessage) {
+    // Handle content as string or array
+    const content = (lastUserMessage as unknown as Record<string, unknown>).content;
+    if (typeof content === 'string') {
+      shouldSuggestWellness = detectWellnessIntent(content);
+    }
+  }
 
   // Add system context if wellness is detected
   const modelMessages = convertToModelMessages(messages);
