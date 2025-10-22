@@ -23,6 +23,7 @@ import type { FC } from "react";
 import { useState, useEffect, useRef } from "react";
 import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
 import * as m from "motion/react-m";
+import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import { MarkdownText } from "@/components/assistant-ui/markdown-text";
@@ -91,24 +92,43 @@ const ThreadWelcome: FC = () => {
   return (
     <div className="aui-thread-welcome-root mx-auto my-auto flex w-full max-w-[var(--thread-max-width)] flex-grow flex-col">
       <div className="aui-thread-welcome-center flex w-full flex-grow flex-col items-center justify-center">
-        <div className="aui-thread-welcome-message flex size-full flex-col justify-center px-8">
+        <div className="aui-thread-welcome-message flex size-full flex-col items-center justify-center px-8 gap-6">
           <m.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            className="aui-thread-welcome-message-motion-1 text-2xl font-semibold"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="aui-thread-welcome-image"
           >
-            Hello there!
+            <Image
+              src="/quabble-duck.png"
+              alt="Quabble Duck"
+              width={120}
+              height={120}
+              priority
+              className="rounded-2xl"
+            />
           </m.div>
-          <m.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ delay: 0.1 }}
-            className="aui-thread-welcome-message-motion-2 text-2xl text-muted-foreground/65"
-          >
-            How can I help you today?
-          </m.div>
+          <div className="flex flex-col items-center gap-2">
+            <m.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ delay: 0.2 }}
+              className="aui-thread-welcome-message-motion-1 text-3xl font-semibold text-center"
+            >
+              Welcome to Quabble
+            </m.div>
+            <m.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ delay: 0.3 }}
+              className="aui-thread-welcome-message-motion-2 text-xl text-muted-foreground/80 text-center"
+            >
+              I&apos;m here to support your mental wellness journey
+            </m.div>
+          </div>
         </div>
       </div>
       <ThreadSuggestions />
@@ -126,19 +146,19 @@ const ThreadSuggestions: FC = () => {
           action: "I'm feeling stressed and anxious. Can you help me?",
         },
         {
-          title: "Explain React hooks",
-          label: "like useState and useEffect",
-          action: "Explain React hooks like useState and useEffect",
-        },
-        {
-          title: "Write a SQL query",
-          label: "to find top customers",
-          action: "Write a SQL query to find top customers",
-        },
-        {
           title: "Guide me through",
           label: "a breathing exercise",
           action: "Guide me through a breathing exercise to help me relax",
+        },
+        {
+          title: "Help me",
+          label: "calm my mind",
+          action: "Help me calm my mind and feel more peaceful",
+        },
+        {
+          title: "I need",
+          label: "support right now",
+          action: "I need support right now. I'm feeling overwhelmed",
         },
       ].map((suggestedAction, index) => (
         <m.div
