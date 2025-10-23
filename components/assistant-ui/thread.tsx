@@ -196,15 +196,6 @@ const ThreadSuggestions: FC = () => {
 const Composer: FC = () => {
   const { setShouldShowWellnessTrigger } = useWellness();
 
-  const checkForWellnessKeywords = (text: string) => {
-    const lowerText = text.toLowerCase();
-    const wellnessKeywords = [
-      'stress', 'stressed', 'anxious', 'anxiety', 'breathing', 'meditation',
-      'calm', 'relax', 'overwhelmed', 'worried', 'nervous', 'tense', 'panic'
-    ];
-    return wellnessKeywords.some(keyword => lowerText.includes(keyword));
-  };
-
   return (
     <div className="aui-composer-wrapper sticky bottom-0 mx-auto flex w-full max-w-[var(--thread-max-width)] flex-col gap-4 overflow-visible rounded-t-3xl bg-background pb-4 md:pb-6">
       <ThreadScrollToBottom />
@@ -214,8 +205,8 @@ const Composer: FC = () => {
           const form = e.currentTarget as HTMLFormElement;
           const input = form.querySelector('textarea') as HTMLTextAreaElement;
           if (input?.value) {
-            const hasWellnessKeywords = checkForWellnessKeywords(input.value);
-            setShouldShowWellnessTrigger(hasWellnessKeywords);
+            // Always show wellness trigger on every message
+            setShouldShowWellnessTrigger(true);
           }
         }}
       >

@@ -4,7 +4,7 @@ import { streamText, UIMessage, convertToModelMessages } from "ai";
 // Wellness keywords to detect when user might benefit from exercises
 const WELLNESS_KEYWORDS = [
   'stress', 'stressed', 'anxious', 'anxiety', 'breathing', 'meditation',
-  'calm', 'relax', 'overwhelmed', 'worried', 'nervous', 'tense', 'panic'
+  'calm', 'relax', 'overwhelmed', 'worried', 'nervous', 'tense', 'panic', 'parenting',
 ];
 
 function detectWellnessIntent(message: string): boolean {
@@ -27,14 +27,38 @@ export async function POST(req: Request) {
     }
   }
 
-  // Add system context if wellness is detected
+  // Convert messages and add system prompts
   const modelMessages = convertToModelMessages(messages);
-  if (shouldSuggestWellness) {
-    modelMessages.unshift({
-      role: 'system',
-      content: 'The user seems to be experiencing stress or anxiety. After providing your response, suggest they try a breathing exercise by mentioning: "Would you like to try a 1-minute breathing exercise? It can help you feel calmer."'
-    });
-  }
+
+  // Base personality system prompt (always included)
+  modelMessages.unshift({
+    role: 'system',
+    content: `You are Quabble, a kind and supportive friend who genuinely cares about mental wellness.
+
+Your personality:
+- Warm, empathetic, and caring - like chatting with a close friend over coffee
+- Use a natural, conversational tone - avoid clinical or robotic language
+- Keep responses concise (2-4 short paragraphs) - respect their time and energy
+- Be supportive without being preachy or patronizing
+- Validate feelings before offering any suggestions
+- Use "I" statements to feel personal: "I'm here for you", "I understand", "I hear you"
+- Ask gentle follow-up questions that show you're truly listening
+
+Your approach:
+- Listen and empathize first, advise second
+- Acknowledge emotions: "That sounds really tough", "I can see why you'd feel that way"
+- Offer gentle suggestions, not instructions
+- Relate to their experience with genuine empathy
+- Keep conversations flowing naturally - like texting a trusted friend
+- Use shorter sentences and occasional line breaks for easy reading
+- Include warmth through language, not emojis
+
+Remember: You're a supportive companion, not a therapist. Focus on emotional support, active listening, and gentle guidance.${
+      shouldSuggestWellness
+        ? '\n\nNote: The user seems stressed or anxious. After showing empathy, gently suggest: "Would you like to try a quick breathing exercise together? It might help you feel a bit calmer right now."'
+        : ''
+    }`
+  });
 
   const result = streamText({
     model: openai("gpt-5-nano"),
