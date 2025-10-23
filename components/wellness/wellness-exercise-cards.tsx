@@ -8,6 +8,7 @@ export interface WellnessExercise {
   id: string;
   title: string;
   description: string;
+  reason: string;
   icon: React.ReactNode;
   color: string;
   duration: string;
@@ -23,6 +24,7 @@ export function WellnessExerciseCards({ onExerciseClick }: WellnessExerciseCards
       id: "breathing",
       title: "Breathing Exercise",
       description: "Calm your mind with guided breathing",
+      reason: "Helps calm your nervous system and reduce anxiety instantly",
       icon: <Wind className="w-5 h-5" />,
       color: "oklch(0.68 0.14 50)", // Warm orange
       duration: "1 min",
@@ -31,6 +33,7 @@ export function WellnessExerciseCards({ onExerciseClick }: WellnessExerciseCards
       id: "gratitude",
       title: "Gratitude Journal",
       description: "Reflect on what you're grateful for",
+      reason: "Shifts your perspective toward positive moments in your life",
       icon: <BookHeart className="w-5 h-5" />,
       color: "oklch(0.88 0.06 60)", // Soft peach
       duration: "3 min",
@@ -39,6 +42,7 @@ export function WellnessExerciseCards({ onExerciseClick }: WellnessExerciseCards
       id: "meditation",
       title: "Mindful Meditation",
       description: "Find peace in the present moment",
+      reason: "Builds awareness and creates mental clarity during chaos",
       icon: <Brain className="w-5 h-5" />,
       color: "oklch(0.52 0.08 145)", // Sage green
       duration: "5 min",
@@ -47,6 +51,7 @@ export function WellnessExerciseCards({ onExerciseClick }: WellnessExerciseCards
       id: "body-scan",
       title: "Body Scan",
       description: "Release tension throughout your body",
+      reason: "Releases physical tension you're holding from stress",
       icon: <Heart className="w-5 h-5" />,
       color: "oklch(0.75 0.12 280)", // Soft purple
       duration: "4 min",
@@ -55,6 +60,7 @@ export function WellnessExerciseCards({ onExerciseClick }: WellnessExerciseCards
       id: "mood-tracker",
       title: "Mood Check-In",
       description: "Track how you're feeling today",
+      reason: "Helps you understand emotional patterns and triggers",
       icon: <Smile className="w-5 h-5" />,
       color: "oklch(0.70 0.15 150)", // Teal
       duration: "2 min",
@@ -63,6 +69,7 @@ export function WellnessExerciseCards({ onExerciseClick }: WellnessExerciseCards
       id: "affirmations",
       title: "Daily Affirmations",
       description: "Boost confidence with positive words",
+      reason: "Rewires negative self-talk into empowering beliefs",
       icon: <Sparkles className="w-5 h-5" />,
       color: "oklch(0.65 0.18 30)", // Golden
       duration: "2 min",
@@ -94,29 +101,29 @@ export function WellnessExerciseCards({ onExerciseClick }: WellnessExerciseCards
             <Button
               variant="outline"
               onClick={() => onExerciseClick(exercise.id)}
-              className="w-full h-auto p-4 flex flex-col items-start gap-2 hover:border-primary/50 hover:bg-accent/50 transition-colors group"
+              className="w-full min-h-[100px] p-4 hover:border-primary/50 hover:bg-accent/50 transition-colors group text-left flex items-start gap-3"
             >
-              <div className="flex items-center gap-3 w-full">
-                <div
-                  className="flex items-center justify-center w-10 h-10 rounded-xl transition-colors"
-                  style={{
-                    backgroundColor: exercise.color + "20",
-                    color: exercise.color,
-                  }}
-                >
-                  {exercise.icon}
-                </div>
-                <div className="flex-1 text-left">
+              <div
+                className="flex items-center justify-center w-10 h-10 rounded-xl transition-colors flex-shrink-0"
+                style={{
+                  backgroundColor: exercise.color + "20",
+                  color: exercise.color,
+                }}
+              >
+                {exercise.icon}
+              </div>
+              <div className="flex-1 space-y-1 overflow-hidden">
+                <div className="flex items-center justify-between gap-2">
                   <div className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
                     {exercise.title}
                   </div>
-                  <div className="text-xs text-muted-foreground line-clamp-1">
-                    {exercise.description}
+                  <div className="text-xs font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-md flex-shrink-0">
+                    {exercise.duration}
                   </div>
                 </div>
-                <div className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-md">
-                  {exercise.duration}
-                </div>
+                <p className="text-xs text-muted-foreground whitespace-normal">
+                  {exercise.reason}
+                </p>
               </div>
             </Button>
           </motion.div>

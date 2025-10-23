@@ -276,7 +276,7 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: index * 0.08 }}
             onClick={() => onExerciseClick(exercise.id)}
-            className="group relative aspect-square max-w-[200px] max-h-[200px] rounded-2xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300 overflow-hidden"
+            className="group relative w-full min-h-[180px] rounded-2xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300 overflow-hidden"
           >
             {/* Background gradient overlay */}
             <div
@@ -285,9 +285,9 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
             />
 
             {/* Content */}
-            <div className="relative h-full flex flex-col items-center justify-center p-4 text-center gap-2">
+            <div className="relative w-full flex flex-col items-center justify-center p-4 text-center gap-2">
               {/* Duck Logo */}
-              <div className="relative w-16 h-16 mb-2">
+              <div className="relative w-16 h-16 flex-shrink-0">
                 <Image
                   src="/quabble-duck.png"
                   alt="Quabble Duck"
@@ -298,20 +298,14 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
               </div>
 
               {/* Title */}
-              <h4 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
+              <h4 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors break-words w-full">
                 {exercise.title}
               </h4>
 
               {/* Description */}
-              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+              <p className="text-xs text-muted-foreground leading-snug break-words w-full">
                 {exercise.description}
               </p>
-
-              {/* Color accent bar at bottom */}
-              <div
-                className="absolute bottom-0 left-0 right-0 h-1 transition-all duration-300 group-hover:h-1.5"
-                style={{ backgroundColor: exercise.color }}
-              />
             </div>
           </motion.button>
         ))}
