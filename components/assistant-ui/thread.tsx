@@ -95,45 +95,6 @@ const ThreadWelcome: FC = () => {
   return (
     <div className="aui-thread-welcome-root mx-auto my-auto flex w-full max-w-7xl flex-grow flex-col overflow-y-auto">
       <div className="aui-thread-welcome-center flex w-full flex-col items-center justify-center py-8">
-        {/* <div className="aui-thread-welcome-message flex flex-col items-center justify-center px-8 gap-6">
-          <m.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="aui-thread-welcome-image"
-          >
-            <Image
-              src="/quabble-duck.png"
-              alt="Quabble Duck"
-              width={120}
-              height={120}
-              priority
-              className="rounded-2xl"
-            />
-          </m.div>
-          <div className="flex flex-col items-center gap-2">
-            <m.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ delay: 0.2 }}
-              className="aui-thread-welcome-message-motion-1 text-3xl font-semibold text-center"
-            >
-              Welcome to Quabble
-            </m.div>
-            <m.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ delay: 0.3 }}
-              className="aui-thread-welcome-message-motion-2 text-xl text-muted-foreground/80 text-center"
-            >
-              I&apos;m here to support your mental wellness journey
-            </m.div>
-          </div>
-        </div> */}
-
         {/* Wellness Exercise Cards Grid */}
         <div className="w-full mt-8">
           <WellnessWelcomeCards onExerciseClick={openWellnessModal} />
@@ -210,7 +171,7 @@ const Composer: FC = () => {
       >
         <ComposerAttachments />
         <ComposerPrimitive.Input
-          placeholder="Send a message..."
+          placeholder="Tell me about what you are struggling with..."
           className="aui-composer-input mb-1 max-h-32 min-h-16 w-full resize-none bg-transparent px-3.5 pt-1.5 pb-3 text-base outline-none placeholder:text-muted-foreground focus:outline-primary"
           rows={1}
           autoFocus
