@@ -265,10 +265,10 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
         animate={{ opacity: 1, y: 0 }}
         className="text-xl font-semibold text-center mb-6 text-foreground"
       >
-        Mental Workouts
+        Choose a workout to boost your mental health
       </motion.h3>
 
-      <div className="grid gap-2 w-full px-2 justify-center" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 180px))' }}>
+      <div className="grid grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(140px,180px))] gap-2 w-full px-2 justify-center">
         {exercises.map((exercise, index) => (
           <motion.button
             key={exercise.id}

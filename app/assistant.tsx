@@ -15,12 +15,24 @@ import { ThreadListSidebar } from "@/components/assistant-ui/threadlist-sidebar"
 import { Separator } from "@/components/ui/separator";
 import { WellnessProvider, useWellness } from "@/components/wellness/wellness-provider";
 import { WellnessModal } from "@/components/wellness/wellness-modal";
+import { RoutineCheckinModal } from "@/components/wellness/routine-checkin-modal";
 import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
+import { ClipboardCheck } from "lucide-react";
 import Image from "next/image";
 
 const AssistantContent = () => {
-  const { isWellnessModalOpen, closeWellnessModal, openWellnessModal } = useWellness();
+  const { 
+    isWellnessModalOpen, 
+    closeWellnessModal, 
+    openWellnessModal,
+    isRoutineCheckinModalOpen,
+    openRoutineCheckinModal,
+    closeRoutineCheckinModal,
+  } = useWellness();
+
+  const handleBreathingExercise = () => {
+    openWellnessModal("breathing");
+  };
 
   return (
     <>
@@ -46,13 +58,12 @@ const AssistantContent = () => {
               </div>
               <div className="ml-auto">
                 <Button
-                  onClick={openWellnessModal}
-                  variant="outline"
+                  onClick={openRoutineCheckinModal}
                   size="sm"
-                  className="gap-2"
+                  className="gap-2 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:from-purple-600 hover:via-pink-600 hover:to-orange-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300"
                 >
-                  <Sparkles className="h-4 w-4" />
-                  Wellness
+                  <ClipboardCheck className="h-4 w-4" />
+                  Routine Check-in
                 </Button>
               </div>
             </header>
@@ -62,6 +73,11 @@ const AssistantContent = () => {
           </SidebarInset>
         </div>
       </SidebarProvider>
+      <RoutineCheckinModal
+        open={isRoutineCheckinModalOpen}
+        onOpenChange={closeRoutineCheckinModal}
+        onBreathingExerciseClick={handleBreathingExercise}
+      />
       <WellnessModal
         open={isWellnessModalOpen}
         onOpenChange={closeWellnessModal}

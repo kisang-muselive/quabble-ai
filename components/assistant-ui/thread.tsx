@@ -96,7 +96,7 @@ const ThreadWelcome: FC = () => {
     <div className="aui-thread-welcome-root mx-auto my-auto flex w-full max-w-7xl flex-grow flex-col overflow-y-auto">
       <div className="aui-thread-welcome-center flex w-full flex-col items-center justify-center py-8">
         {/* Wellness Exercise Cards Grid */}
-        <div className="w-full mt-8">
+        <div className="w-full">
           <WellnessWelcomeCards onExerciseClick={openWellnessModal} />
         </div>
       </div>
