@@ -7,6 +7,7 @@ import {
   CopyIcon,
   PencilIcon,
   RefreshCwIcon,
+  Sparkles,
   Square,
 } from "lucide-react";
 
@@ -20,10 +21,9 @@ import {
 } from "@assistant-ui/react";
 
 import type { FC } from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
 import * as m from "motion/react-m";
-import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import { MarkdownText } from "@/components/assistant-ui/markdown-text";
@@ -202,21 +202,11 @@ const ThreadSuggestions: FC = () => {
 };
 
 const Composer: FC = () => {
-  const { setShouldShowWellnessTrigger } = useWellness();
-
   return (
     <div className="aui-composer-wrapper sticky bottom-0 mx-auto flex w-full max-w-[var(--thread-max-width)] flex-col gap-4 overflow-visible rounded-t-3xl bg-background pb-4 md:pb-6">
       <ThreadScrollToBottom />
       <ComposerPrimitive.Root
         className="aui-composer-root relative flex w-full flex-col rounded-3xl border border-border bg-card px-1 pt-2 shadow-[0_9px_9px_0px_rgba(0,0,0,0.01),0_2px_5px_0px_rgba(0,0,0,0.06)] dark:border-muted-foreground/15"
-        onSubmit={(e) => {
-          const form = e.currentTarget as HTMLFormElement;
-          const input = form.querySelector('textarea') as HTMLTextAreaElement;
-          if (input?.value) {
-            // Always show wellness trigger on every message
-            setShouldShowWellnessTrigger(true);
-          }
-        }}
       >
         <ComposerAttachments />
         <ComposerPrimitive.Input
@@ -281,23 +271,8 @@ const MessageError: FC = () => {
 };
 
 const AssistantMessage: FC = () => {
-  const { openWellnessModal, shouldShowWellnessTrigger, setShouldShowWellnessTrigger } = useWellness();
-  const [hasShownTrigger, setHasShownTrigger] = useState(false);
-
-  // Show trigger when wellness was detected and we haven't shown it yet for this message
-  useEffect(() => {
-    if (shouldShowWellnessTrigger && !hasShownTrigger) {
-      setHasShownTrigger(true);
-    }
-  }, [shouldShowWellnessTrigger, hasShownTrigger]);
-
-  // Reset when starting a new conversation
-  useEffect(() => {
-    return () => {
-      setHasShownTrigger(false);
-      setShouldShowWellnessTrigger(false);
-    };
-  }, [setShouldShowWellnessTrigger]);
+  const { openWellnessModal } = useWellness();
+  const [showExerciseCards, setShowExerciseCards] = useState(false);
 
   return (
     <MessagePrimitive.Root asChild>
@@ -313,9 +288,35 @@ const AssistantMessage: FC = () => {
             }}
           />
           <MessageError />
-          {hasShownTrigger && (
-            <WellnessExerciseCards onExerciseClick={openWellnessModal} />
-          )}
+        </div>
+
+        {/* Wellness Button - Only show after message is complete */}
+        <ThreadPrimitive.If running={false}>
+          <div className="mx-2">
+            <div className="mt-4 flex justify-start">
+              <Button
+                onClick={() => setShowExerciseCards(!showExerciseCards)}
+                variant={showExerciseCards ? "outline" : "default"}
+                size="sm"
+                className={showExerciseCards 
+                  ? "gap-2" 
+                  : "gap-2 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:from-purple-600 hover:via-pink-600 hover:to-orange-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300"
+                }
+              >
+                <Sparkles className="h-4 w-4" />
+                {showExerciseCards ? "Hide Wellness Exercises" : "Show Wellness Exercises"}
+              </Button>
+            </div>
+
+            {/* Exercise Cards */}
+            {showExerciseCards && (
+              <WellnessExerciseCards onExerciseClick={openWellnessModal} />
+            )}
+          </div>
+        </ThreadPrimitive.If>
+
+        <div className="aui-assistant-message-content-invisible">
+          {/* Dummy div for proper spacing */}
         </div>
 
         <div className="aui-assistant-message-footer mt-2 ml-2 flex">
