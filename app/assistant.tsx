@@ -31,7 +31,7 @@ const AssistantContent = () => {
 
   return (
     <>
-      <SidebarProvider>
+      <SidebarProvider defaultOpen={false}>
         <div className="flex h-dvh w-full pr-0.5">
           <ThreadListSidebar />
           <SidebarInset>

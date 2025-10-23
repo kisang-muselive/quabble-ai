@@ -35,7 +35,8 @@ import {
   UserMessageAttachments,
 } from "@/components/assistant-ui/attachment";
 import { useWellness } from "@/components/wellness/wellness-provider";
-import { WellnessTrigger } from "@/components/wellness/wellness-trigger";
+import { WellnessExerciseCards } from "@/components/wellness/wellness-exercise-cards";
+import { WellnessWelcomeCards } from "@/components/wellness/wellness-welcome-cards";
 
 import { cn } from "@/lib/utils";
 
@@ -89,10 +90,12 @@ const ThreadScrollToBottom: FC = () => {
 };
 
 const ThreadWelcome: FC = () => {
+  const { openWellnessModal } = useWellness();
+
   return (
-    <div className="aui-thread-welcome-root mx-auto my-auto flex w-full max-w-[var(--thread-max-width)] flex-grow flex-col">
-      <div className="aui-thread-welcome-center flex w-full flex-grow flex-col items-center justify-center">
-        <div className="aui-thread-welcome-message flex size-full flex-col items-center justify-center px-8 gap-6">
+    <div className="aui-thread-welcome-root mx-auto my-auto flex w-full max-w-7xl flex-grow flex-col overflow-y-auto">
+      <div className="aui-thread-welcome-center flex w-full flex-col items-center justify-center py-8">
+        {/* <div className="aui-thread-welcome-message flex flex-col items-center justify-center px-8 gap-6">
           <m.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -129,9 +132,14 @@ const ThreadWelcome: FC = () => {
               I&apos;m here to support your mental wellness journey
             </m.div>
           </div>
+        </div> */}
+
+        {/* Wellness Exercise Cards Grid */}
+        <div className="w-full mt-8">
+          <WellnessWelcomeCards onExerciseClick={openWellnessModal} />
         </div>
       </div>
-      <ThreadSuggestions />
+      {/* <ThreadSuggestions /> */}
     </div>
   );
 };
@@ -306,7 +314,7 @@ const AssistantMessage: FC = () => {
           />
           <MessageError />
           {hasShownTrigger && (
-            <WellnessTrigger onClick={openWellnessModal} />
+            <WellnessExerciseCards onExerciseClick={openWellnessModal} />
           )}
         </div>
 
