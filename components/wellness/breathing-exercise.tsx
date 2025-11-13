@@ -462,7 +462,7 @@ export function BreathingExercise({
       <div className="absolute inset-0 bg-white/70" />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full w-full">
+      <div className="relative z-10 flex flex-col items-center h-full w-full pt-24">
         {/* Lottie Animations Container - Fixed position */}
         <div className="relative flex items-center justify-center w-[375px] h-[375px] mb-6">
           {/* Semi-transparent white circle background */}
@@ -470,10 +470,10 @@ export function BreathingExercise({
             <div className="w-[269px] h-[269px] rounded-full bg-white/30" />
           </div>
 
-          {/* Duck Animation */}
+          {/* Duck Animation - Clipped to circular background */}
           {duckAnimationData && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-[269px] h-[269px]">
+              <div className="w-[269px] h-[269px] rounded-full overflow-hidden">
                 <Lottie
                   lottieRef={duckLottieRef}
                   animationData={duckAnimationData}
