@@ -21,9 +21,10 @@ import { ClipboardCheck } from "lucide-react";
 import Image from "next/image";
 
 const AssistantContent = () => {
-  const { 
-    isWellnessModalOpen, 
-    closeWellnessModal, 
+  const {
+    isWellnessModalOpen,
+    currentExerciseId,
+    closeWellnessModal,
     openWellnessModal,
     isRoutineCheckinModalOpen,
     openRoutineCheckinModal,
@@ -81,6 +82,7 @@ const AssistantContent = () => {
       <WellnessModal
         open={isWellnessModalOpen}
         onOpenChange={closeWellnessModal}
+        exerciseId={currentExerciseId}
       />
     </>
   );

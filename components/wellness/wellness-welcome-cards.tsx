@@ -149,6 +149,12 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
       color: "oklch(0.68 0.10 180)", // Cyan
     },
     {
+      id: "555-breathing",
+      title: "5-5-5 Breathing",
+      description: "Equal breath intervals for balance",
+      color: "oklch(0.70 0.12 190)", // Soft teal
+    },
+    {
       id: "worry-time",
       title: "Worry Time",
       description: "Contain worries to a specific time",
