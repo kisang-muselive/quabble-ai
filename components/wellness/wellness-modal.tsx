@@ -33,11 +33,13 @@ export function WellnessModal({
 }: WellnessModalProps) {
   const [selectedTechnique, setSelectedTechnique] = useState<BreathingExerciseType>("478");
   const [isExerciseStarted, setIsExerciseStarted] = useState(false);
+  const [exerciseKey, setExerciseKey] = useState(0);
 
   // Reset state when modal opens/closes
   useEffect(() => {
     if (open) {
       setIsExerciseStarted(false);
+      setExerciseKey(0); // Reset exercise key for fresh start
       // Map exercise IDs to breathing exercise types
       const getBreathingExerciseType = (id: string): BreathingExerciseType => {
         switch (id) {
@@ -70,6 +72,7 @@ export function WellnessModal({
   };
 
   const handleBegin = () => {
+    setExerciseKey(prev => prev + 1); // Force remount of exercise component
     setIsExerciseStarted(true);
   };
 
@@ -82,10 +85,10 @@ export function WellnessModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md p-0 overflow-hidden border-0 rounded-lg sm:rounded-lg" showCloseButton={false}>
+      <DialogContent className="max-w-md h-[600px] p-0 overflow-hidden border-0 rounded-lg sm:rounded-lg" showCloseButton={false}>
         {!isExerciseStarted ? (
           // Selection Screen
-          <div className="relative min-h-[600px] flex flex-col">
+          <div className="relative h-[600px] flex flex-col">
             {/* Background image based on technique */}
             <div 
               className="absolute inset-0 bg-cover bg-center"
@@ -185,8 +188,9 @@ export function WellnessModal({
           </div>
         ) : (
           // Exercise Screen
-          <div className="py-4">
+          <div className="h-[600px] overflow-hidden">
             <BreathingExercise
+              key={`${selectedTechnique}-${exerciseKey}`}
               exerciseType={selectedTechnique}
               onComplete={handleComplete}
             />

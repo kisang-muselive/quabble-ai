@@ -114,6 +114,10 @@ export function BreathingExercise({
   const audioGuideRef = useRef<HTMLAudioElement | null>(null);
   const audioCountdownRef = useRef<HTMLAudioElement | null>(null);
 
+  // Lottie animation refs
+  const gaugeLottieRef = useRef<any>(null);
+  const [gaugeTotalFrames, setGaugeTotalFrames] = useState<number>(0);
+
   // Lottie animation data
   const [duckAnimationData, setDuckAnimationData] = useState<object | null>(null);
   const [gaugeAnimationData, setGaugeAnimationData] = useState<object | null>(null);
@@ -127,7 +131,22 @@ export function BreathingExercise({
 
     fetch(config.gaugeAnimation)
       .then((res) => res.json())
-      .then((data) => setGaugeAnimationData(data))
+      .then((data) => {
+        setGaugeAnimationData(data);
+        // Store total frames for progress calculation
+        // Lottie JSON format: 'op' is total frames, 'fr' is frame rate, 'h' is height (sometimes used for duration)
+        if (data.op && typeof data.op === 'number') {
+          setGaugeTotalFrames(data.op);
+        } else if (data.fr && typeof data.fr === 'number') {
+          // Calculate total frames from frame rate and duration
+          // If 'op' is not available, try to calculate from other properties
+          const frameRate = data.fr;
+          const duration = data.op || (data.h ? data.h / frameRate : 0);
+          if (duration > 0) {
+            setGaugeTotalFrames(Math.floor(duration * frameRate));
+          }
+        }
+      })
       .catch((err) => console.error("Failed to load gauge animation:", err));
   }, [config]);
 
@@ -212,12 +231,40 @@ export function BreathingExercise({
     return () => clearInterval(timer);
   }, [breathingStarted, currentSecond, config.totalDuration, onComplete]);
 
+  // Update gauge animation progress based on exercise progress
+  useEffect(() => {
+    if (!gaugeLottieRef.current || gaugeTotalFrames === 0) return;
+
+    if (!breathingStarted) {
+      // Reset to frame 0 when exercise hasn't started
+      if (gaugeLottieRef.current.goToAndStop) {
+        gaugeLottieRef.current.goToAndStop(0, true);
+      }
+      return;
+    }
+
+    const progress = currentSecond / config.totalDuration;
+    const targetFrame = Math.min(Math.floor(progress * gaugeTotalFrames), gaugeTotalFrames - 1);
+    
+    if (gaugeLottieRef.current.goToAndStop) {
+      gaugeLottieRef.current.goToAndStop(targetFrame, true);
+    } else if (gaugeLottieRef.current.playSegments) {
+      // Alternative method if goToAndStop doesn't work
+      const segment = [0, targetFrame];
+      gaugeLottieRef.current.playSegments(segment, true);
+    }
+  }, [breathingStarted, currentSecond, config.totalDuration, gaugeTotalFrames]);
+
   const handleStart = () => {
     setCountdownPhase(3);
     setReadyDots([false, false, false]);
     setCurrentSecond(0);
     setIsCountingDown(true);
     setAnimate(true);
+    // Reset gauge animation to start
+    if (gaugeLottieRef.current && gaugeLottieRef.current.goToAndStop) {
+      gaugeLottieRef.current.goToAndStop(0, true);
+    }
   };
 
   const handleStop = () => {
@@ -267,7 +314,7 @@ export function BreathingExercise({
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-[600px] space-y-6 py-6 px-4 relative"
+      className="flex flex-col items-center justify-center h-[600px] space-y-6 py-6 px-4 relative"
       style={{
         backgroundImage: `url(${config.background})`,
         backgroundSize: "cover",
@@ -305,10 +352,40 @@ export function BreathingExercise({
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-[375px] h-[375px]">
                 <Lottie
+                  lottieRef={gaugeLottieRef}
                   animationData={gaugeAnimationData}
-                  loop={true}
-                  autoplay={animate}
+                  loop={false}
+                  autoplay={false}
                   style={{ width: "100%", height: "100%" }}
+                  onDOMLoaded={() => {
+                    // Get total frames when animation DOM is loaded
+                    // The ref gives access to the lottie-web animation instance
+                    if (gaugeLottieRef.current) {
+                      const animation = gaugeLottieRef.current;
+                      
+                      // Try multiple ways to get total frames
+                      if (animation.totalFrames) {
+                        setGaugeTotalFrames(animation.totalFrames);
+                      } else if (animation.renderer && animation.renderer.totalFrames) {
+                        setGaugeTotalFrames(animation.renderer.totalFrames);
+                      } else if (gaugeAnimationData && typeof gaugeAnimationData === 'object') {
+                        // Fallback: get from animation data
+                        const data = gaugeAnimationData as any;
+                        if (data.op && typeof data.op === 'number') {
+                          setGaugeTotalFrames(data.op);
+                        }
+                      }
+                      
+                      // Reset to frame 0 initially
+                      if (animation.goToAndStop) {
+                        animation.goToAndStop(0, true);
+                      } else if (animation.setSpeed) {
+                        // Alternative: stop at frame 0
+                        animation.setSpeed(0);
+                        animation.goToAndPlay(0, true);
+                      }
+                    }
+                  }}
                 />
               </div>
             </div>
