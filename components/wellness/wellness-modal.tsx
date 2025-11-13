@@ -85,10 +85,10 @@ export function WellnessModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md h-[600px] p-0 overflow-hidden border-0 rounded-lg sm:rounded-lg" showCloseButton={false}>
+      <DialogContent className="max-w-md h-[85vh] max-h-[900px] p-0 overflow-hidden border-0 rounded-lg sm:rounded-lg" showCloseButton={false}>
         {!isExerciseStarted ? (
           // Selection Screen
-          <div className="relative h-[600px] flex flex-col">
+          <div className="relative h-full flex flex-col">
             {/* Background image based on technique */}
             <div 
               className="absolute inset-0 bg-cover bg-center"
@@ -188,7 +188,7 @@ export function WellnessModal({
           </div>
         ) : (
           // Exercise Screen
-          <div className="h-[600px] overflow-hidden">
+          <div className="h-full overflow-hidden">
             <BreathingExercise
               key={`${selectedTechnique}-${exerciseKey}`}
               exerciseType={selectedTechnique}

@@ -390,7 +390,7 @@ export function BreathingExercise({
 
   return (
     <div
-      className="flex flex-col items-center justify-center h-[600px] space-y-6 py-6 px-4 relative"
+      className="flex flex-col items-center justify-center h-full min-h-[600px] space-y-6 py-6 px-4 relative"
       style={{
         backgroundImage: `url(${config.background})`,
         backgroundSize: "cover",
@@ -401,9 +401,9 @@ export function BreathingExercise({
       <div className="absolute inset-0 bg-white/70" />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center space-y-6">
-        {/* Lottie Animations Container */}
-        <div className="relative flex items-center justify-center w-[375px] h-[375px]">
+      <div className="relative z-10 flex flex-col items-center justify-center h-full w-full">
+        {/* Lottie Animations Container - Fixed position */}
+        <div className="relative flex items-center justify-center w-[375px] h-[375px] mb-6">
           {/* Semi-transparent white circle background */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-[269px] h-[269px] rounded-full bg-white/30" />
@@ -469,8 +469,8 @@ export function BreathingExercise({
           )}
         </div>
 
-        {/* Phase Instruction */}
-        <div className="text-center space-y-2">
+        {/* Phase Instruction - Fixed height to prevent layout shift */}
+        <div className="text-center min-h-[180px] flex flex-col justify-center items-center mb-6">
           {isCountingDown && (
             <>
               <p className="text-2xl font-semibold text-foreground">Get Ready</p>
@@ -517,7 +517,7 @@ export function BreathingExercise({
                   initial={{ scale: 1 }}
                   animate={{ scale: 1.1 }}
                   transition={{ duration: 0.2 }}
-                  className="text-sm text-muted-foreground"
+                  className="text-sm text-muted-foreground mt-2"
                 >
                   •
                 </motion.div>
@@ -530,8 +530,8 @@ export function BreathingExercise({
           )}
         </div>
 
-        {/* Instructions or Stats */}
-        <div className="text-center space-y-2 max-w-md">
+        {/* Instructions or Stats - Fixed height to prevent layout shift */}
+        <div className="text-center min-h-[80px] flex flex-col justify-center items-center max-w-md mb-6">
           {!isActive ? (
             <>
               <h3 className="text-xl font-semibold text-foreground">{config.name}</h3>
@@ -561,8 +561,8 @@ export function BreathingExercise({
           )}
         </div>
 
-        {/* Controls */}
-        <div className="flex gap-3">
+        {/* Controls - Fixed height to prevent layout shift */}
+        <div className="flex gap-3 min-h-[48px] items-center justify-center">
           {!isActive ? (
             <Button
               onClick={handleStart}
