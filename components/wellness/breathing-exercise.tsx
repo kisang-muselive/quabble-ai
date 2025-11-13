@@ -118,6 +118,8 @@ export function BreathingExercise({
   // Lottie animation refs
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const gaugeLottieRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const duckLottieRef = useRef<any>(null);
   const [gaugeTotalFrames, setGaugeTotalFrames] = useState<number>(0);
   const currentFrameRef = useRef<number>(0);
   const animationFrameRef = useRef<number | null>(null);
@@ -239,7 +241,7 @@ export function BreathingExercise({
     return () => clearInterval(timer);
   }, [breathingStarted, currentSecond, config.totalDuration, onComplete]);
 
-  // Update gauge animation progress smoothly based on exercise progress
+  // Update gauge and duck animations to match breathing phases
   useEffect(() => {
     if (!gaugeLottieRef.current || gaugeTotalFrames === 0) return;
 
@@ -252,15 +254,21 @@ export function BreathingExercise({
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
       }
-      const animation = gaugeLottieRef.current;
-      if (animation.stop) animation.stop();
-      if (animation.goToAndStop) {
-        animation.goToAndStop(0, true);
+      const gaugeAnimation = gaugeLottieRef.current;
+      if (gaugeAnimation.stop) gaugeAnimation.stop();
+      if (gaugeAnimation.goToAndStop) {
+        gaugeAnimation.goToAndStop(0, true);
+      }
+      // Reset duck animation
+      if (duckLottieRef.current) {
+        const duckAnimation = duckLottieRef.current;
+        if (duckAnimation.stop) duckAnimation.stop();
+        if (duckAnimation.setSpeed) duckAnimation.setSpeed(1);
       }
       return;
     }
 
-    // Use requestAnimationFrame for smooth 60fps updates with real-time progress
+    // Use requestAnimationFrame for smooth 60fps updates with phase-based progress
     const animateProgress = (currentTime: number) => {
       if (!gaugeLottieRef.current || !breathingStarted || !startTimeRef.current) {
         animationFrameRef.current = null;
@@ -276,26 +284,79 @@ export function BreathingExercise({
         // Set to final frame
         const finalFrame = gaugeTotalFrames - 1;
         currentFrameRef.current = finalFrame;
-        const animation = gaugeLottieRef.current;
-        if (animation.goToAndStop) {
-          animation.goToAndStop(finalFrame, true);
+        const gaugeAnimation = gaugeLottieRef.current;
+        if (gaugeAnimation.goToAndStop) {
+          gaugeAnimation.goToAndStop(finalFrame, true);
         }
         animationFrameRef.current = null;
         return;
       }
 
-      // Calculate current progress (0 to 1) based on real elapsed time
-      const progress = elapsedSeconds / config.totalDuration;
-      const targetFrame = Math.min(progress * gaugeTotalFrames, gaugeTotalFrames - 1);
+      // Calculate progress based on breathing phases (for box breathing: 4-4-4-4 pattern)
+      let progress = 0;
+      
+      if (exerciseType === "box") {
+        // Box breathing: each 4-second phase should complete 25% of the circle
+        // Phase 0 (INHALE 0-4s): 0-25%
+        // Phase 1 (HOLD 4-8s): 25-50%
+        // Phase 2 (EXHALE 8-12s): 50-75%
+        // Phase 3 (HOLD 12-16s): 75-100%
+        // Then repeats for next cycle
+        
+        const cyclePosition = elapsedSeconds % config.cycleDuration; // 0-16 seconds within current cycle
+        const phaseIndex = config.getPhaseAtSecond(Math.floor(elapsedSeconds));
+        const phasePosition = cyclePosition % 4; // Position within current 4-second phase (0-4)
+        
+        // Each phase moves 25% of the circle
+        // Base progress from phase index (0, 0.25, 0.5, 0.75)
+        const phaseBaseProgress = phaseIndex / 4;
+        // Progress within the current phase (0-1, scaled to 25% of circle)
+        const phaseTimeProgress = phasePosition / 4;
+        
+        // Total progress: phase base + phase time progress
+        // This makes each phase complete 25% of the circle
+        progress = (phaseBaseProgress + phaseTimeProgress / 4);
+        
+        // Keep progress between 0 and 1 (it will naturally wrap due to modulo)
+        progress = progress % 1;
+      } else {
+        // For other breathing types, use linear progress
+        progress = elapsedSeconds / config.totalDuration;
+      }
 
-      // Update frame directly for smooth linear progress
+      const targetFrame = Math.min(progress * gaugeTotalFrames, gaugeTotalFrames - 1);
       currentFrameRef.current = targetFrame;
 
-      // Update animation with decimal precision for smooth rendering
-      const animation = gaugeLottieRef.current;
-      if (animation.goToAndStop) {
-        // Use decimal frame value - Lottie supports sub-frame rendering
-        animation.goToAndStop(targetFrame, true);
+      // Update gauge animation
+      const gaugeAnimation = gaugeLottieRef.current;
+      if (gaugeAnimation.goToAndStop) {
+        gaugeAnimation.goToAndStop(targetFrame, true);
+      }
+
+      // Control duck animation - start it and adjust speed based on breathing phase
+      if (duckLottieRef.current) {
+        const duckAnimation = duckLottieRef.current;
+        
+        // Ensure duck animation is playing
+        if (duckAnimation.play) {
+          duckAnimation.play();
+        }
+        
+        // Adjust duck animation speed based on phase (for box breathing)
+        if (exerciseType === "box") {
+          const phaseIndex = config.getPhaseAtSecond(Math.floor(elapsedSeconds));
+          
+          // INHALE: faster (expanding), HOLD: slow/stop, EXHALE: faster (contracting), HOLD: slow/stop
+          if (duckAnimation.setSpeed) {
+            if (phaseIndex === 0 || phaseIndex === 2) {
+              // INHALE or EXHALE - animate faster
+              duckAnimation.setSpeed(1.5);
+            } else {
+              // HOLD phases - animate slower
+              duckAnimation.setSpeed(0.5);
+            }
+          }
+        }
       }
 
       // Continue animating at 60fps
@@ -314,7 +375,7 @@ export function BreathingExercise({
         animationFrameRef.current = null;
       }
     };
-  }, [breathingStarted, config.totalDuration, gaugeTotalFrames]);
+  }, [breathingStarted, config.totalDuration, config.totalCycles, config.cycleDuration, gaugeTotalFrames, exerciseType, config]);
 
   const handleStart = () => {
     setCountdownPhase(3);
@@ -414,9 +475,10 @@ export function BreathingExercise({
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-[269px] h-[269px]">
                 <Lottie
+                  lottieRef={duckLottieRef}
                   animationData={duckAnimationData}
                   loop={true}
-                  autoplay={animate}
+                  autoplay={breathingStarted}
                   style={{ width: "100%", height: "100%" }}
                 />
               </div>
@@ -503,8 +565,9 @@ export function BreathingExercise({
             <>
               <motion.p
                 key={getCurrentPhaseText()}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
                 className="text-4xl font-bold"
                 style={{ color: getPhaseColor(getCurrentPhaseText()) }}
               >
