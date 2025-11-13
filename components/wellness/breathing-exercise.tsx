@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { X } from "lucide-react";
 import Lottie from "lottie-react";
 
 export type BreathingExerciseType = "box" | "478" | "555";
@@ -180,6 +181,12 @@ export function BreathingExercise({
       audioCountdownRef.current?.pause();
     };
   }, [config]);
+
+  // Auto-start countdown when component mounts
+  useEffect(() => {
+    // Start countdown automatically when component mounts
+    setIsCountingDown(true);
+  }, []);
 
   // Countdown phase logic
   useEffect(() => {
@@ -451,19 +458,70 @@ export function BreathingExercise({
 
   return (
     <div
-      className="flex flex-col items-center justify-center h-full min-h-[600px] space-y-6 py-6 px-4 relative"
+      className="flex flex-col items-center justify-center h-full w-full space-y-6 py-6 px-4 relative"
       style={{
         backgroundImage: `url(${config.background})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
-      {/* Semi-transparent overlay */}
-      <div className="absolute inset-0 bg-white/70" />
+      {/* Semi-transparent overlay - full coverage */}
+      <div className="absolute inset-0 bg-white/70 w-full h-full" />
+
+      {/* Close button */}
+      <button
+        onClick={onComplete}
+        className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+        aria-label="Close exercise"
+      >
+        <X className="w-6 h-6 text-foreground" />
+      </button>
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center h-full w-full pt-24">
-        {/* Lottie Animations Container - Fixed position */}
+      <div className="relative z-10 flex flex-col items-center h-full w-full pt-4">
+        {/* Phase Instruction - Fixed height to prevent layout shift - Moved to top */}
+        <div className="text-center min-h-[100px] flex flex-col justify-center items-center mb-4">
+          {isCountingDown && (
+            <div className="flex justify-center gap-2">
+              {readyDots.map((active, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ scale: 0.8, opacity: 0.3 }}
+                  animate={{
+                    scale: active ? 1.2 : 0.8,
+                    opacity: active ? 1 : 0.3,
+                  }}
+                  transition={{ duration: 0.3 }}
+                  className="w-4 h-4 rounded-full"
+                  style={{
+                    backgroundColor: active
+                      ? getPhaseColor(config.breatheStatus[0])
+                      : "#ccc",
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
+          {breathingStarted && (
+            <motion.p
+              key={getCurrentPhaseText()}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
+              className="text-4xl font-bold"
+              style={{ color: getPhaseColor(getCurrentPhaseText()) }}
+            >
+              {getCurrentPhaseText()}
+            </motion.p>
+          )}
+
+          {!isActive && (
+            <p className="text-3xl font-semibold text-foreground">Ready to Begin</p>
+          )}
+        </div>
+
+        {/* Lottie Animations Container - Moved below phase text */}
         <div className="relative flex items-center justify-center w-[375px] h-[375px] mb-6">
           {/* Semi-transparent white circle background */}
           <div className="absolute inset-0 flex items-center justify-center">
@@ -500,7 +558,7 @@ export function BreathingExercise({
                     // The ref gives access to the lottie-web animation instance
                     if (gaugeLottieRef.current) {
                       const animation = gaugeLottieRef.current;
-                      
+
                       // Try multiple ways to get total frames
                       if (animation.totalFrames) {
                         setGaugeTotalFrames(animation.totalFrames);
@@ -514,7 +572,7 @@ export function BreathingExercise({
                           setGaugeTotalFrames(data.op);
                         }
                       }
-                      
+
                       // Reset to frame 0 initially
                       if (animation.goToAndStop) {
                         animation.goToAndStop(0, true);
@@ -531,78 +589,9 @@ export function BreathingExercise({
           )}
         </div>
 
-        {/* Phase Instruction - Fixed height to prevent layout shift */}
-        <div className="text-center min-h-[180px] flex flex-col justify-center items-center mb-6">
-          {isCountingDown && (
-            <>
-              <p className="text-2xl font-semibold text-foreground">Get Ready</p>
-              <div className="flex justify-center gap-2 mt-4">
-                {readyDots.map((active, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ scale: 0.8, opacity: 0.3 }}
-                    animate={{
-                      scale: active ? 1.2 : 0.8,
-                      opacity: active ? 1 : 0.3,
-                    }}
-                    transition={{ duration: 0.3 }}
-                    className="w-4 h-4 rounded-full"
-                    style={{
-                      backgroundColor: active
-                        ? getPhaseColor(config.breatheStatus[0])
-                        : "#ccc",
-                    }}
-                  />
-                ))}
-              </div>
-              <p className="text-6xl font-bold mt-4" style={{ color: getPhaseColor(config.breatheStatus[0]) }}>
-                {countdownPhase}
-              </p>
-            </>
-          )}
-
-          {breathingStarted && (
-            <>
-              <motion.p
-                key={getCurrentPhaseText()}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.2 }}
-                className="text-4xl font-bold"
-                style={{ color: getPhaseColor(getCurrentPhaseText()) }}
-              >
-                {getCurrentPhaseText()}
-              </motion.p>
-
-              {/* Tick marks indicator */}
-              {config.tickMarks.includes(currentSecond) && (
-                <motion.div
-                  initial={{ scale: 1 }}
-                  animate={{ scale: 1.1 }}
-                  transition={{ duration: 0.2 }}
-                  className="text-sm text-muted-foreground mt-2"
-                >
-                  •
-                </motion.div>
-              )}
-            </>
-          )}
-
-          {!isActive && (
-            <p className="text-3xl font-semibold text-foreground">Ready to Begin</p>
-          )}
-        </div>
-
-        {/* Instructions or Stats - Fixed height to prevent layout shift */}
-        <div className="text-center min-h-[80px] flex flex-col justify-center items-center max-w-md mb-6">
-          {!isActive ? (
-            <>
-              <h3 className="text-xl font-semibold text-foreground">{config.name}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {config.description}
-              </p>
-            </>
-          ) : (
+        {/* Stats - Only show when active */}
+        {isActive && (
+          <div className="text-center min-h-[80px] flex flex-col justify-center items-center max-w-md mb-6">
             <div className="flex justify-center gap-8 text-sm">
               <div>
                 <p className="text-muted-foreground">Time</p>
@@ -621,30 +610,8 @@ export function BreathingExercise({
                 </p>
               </div>
             </div>
-          )}
-        </div>
-
-        {/* Controls - Fixed height to prevent layout shift */}
-        <div className="flex gap-3 min-h-[48px] items-center justify-center">
-          {!isActive ? (
-            <Button
-              onClick={handleStart}
-              size="lg"
-              className="min-w-[200px] bg-primary hover:bg-primary/90"
-            >
-              Start Exercise
-            </Button>
-          ) : (
-            <Button
-              onClick={handleStop}
-              variant="outline"
-              size="lg"
-              className="min-w-[200px]"
-            >
-              Stop
-            </Button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
