@@ -109,14 +109,20 @@ export function BreathingExercise({
   const [currentSecond, setCurrentSecond] = useState(0);
   const [animate, setAnimate] = useState(true);
   const [readyDots, setReadyDots] = useState([false, false, false]);
+  const startTimeRef = useRef<number>(0);
 
   // Audio refs
   const audioGuideRef = useRef<HTMLAudioElement | null>(null);
   const audioCountdownRef = useRef<HTMLAudioElement | null>(null);
 
   // Lottie animation refs
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const gaugeLottieRef = useRef<any>(null);
   const [gaugeTotalFrames, setGaugeTotalFrames] = useState<number>(0);
+  const currentFrameRef = useRef<number>(0);
+  const animationFrameRef = useRef<number | null>(null);
+  const targetFrameRef = useRef<number>(0);
+  const lastTimeRef = useRef<number>(0);
 
   // Lottie animation data
   const [duckAnimationData, setDuckAnimationData] = useState<object | null>(null);
@@ -200,6 +206,8 @@ export function BreathingExercise({
       // Countdown finished, start breathing
       setIsCountingDown(false);
       setBreathingStarted(true);
+      // Set start time for smooth animation progress tracking
+      startTimeRef.current = performance.now();
 
       // Start audio guide after 1 second
       setTimeout(() => {
@@ -231,29 +239,82 @@ export function BreathingExercise({
     return () => clearInterval(timer);
   }, [breathingStarted, currentSecond, config.totalDuration, onComplete]);
 
-  // Update gauge animation progress based on exercise progress
+  // Update gauge animation progress smoothly based on exercise progress
   useEffect(() => {
     if (!gaugeLottieRef.current || gaugeTotalFrames === 0) return;
 
     if (!breathingStarted) {
       // Reset to frame 0 when exercise hasn't started
-      if (gaugeLottieRef.current.goToAndStop) {
-        gaugeLottieRef.current.goToAndStop(0, true);
+      currentFrameRef.current = 0;
+      targetFrameRef.current = 0;
+      lastTimeRef.current = 0;
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      const animation = gaugeLottieRef.current;
+      if (animation.stop) animation.stop();
+      if (animation.goToAndStop) {
+        animation.goToAndStop(0, true);
       }
       return;
     }
 
-    const progress = currentSecond / config.totalDuration;
-    const targetFrame = Math.min(Math.floor(progress * gaugeTotalFrames), gaugeTotalFrames - 1);
-    
-    if (gaugeLottieRef.current.goToAndStop) {
-      gaugeLottieRef.current.goToAndStop(targetFrame, true);
-    } else if (gaugeLottieRef.current.playSegments) {
-      // Alternative method if goToAndStop doesn't work
-      const segment = [0, targetFrame];
-      gaugeLottieRef.current.playSegments(segment, true);
+    // Use requestAnimationFrame for smooth 60fps updates with real-time progress
+    const animateProgress = (currentTime: number) => {
+      if (!gaugeLottieRef.current || !breathingStarted || !startTimeRef.current) {
+        animationFrameRef.current = null;
+        return;
+      }
+
+      // Calculate real-time elapsed milliseconds since breathing started
+      const elapsedMs = currentTime - startTimeRef.current;
+      const elapsedSeconds = elapsedMs / 1000;
+
+      // Check if exercise is complete
+      if (elapsedSeconds >= config.totalDuration) {
+        // Set to final frame
+        const finalFrame = gaugeTotalFrames - 1;
+        currentFrameRef.current = finalFrame;
+        const animation = gaugeLottieRef.current;
+        if (animation.goToAndStop) {
+          animation.goToAndStop(finalFrame, true);
+        }
+        animationFrameRef.current = null;
+        return;
+      }
+
+      // Calculate current progress (0 to 1) based on real elapsed time
+      const progress = elapsedSeconds / config.totalDuration;
+      const targetFrame = Math.min(progress * gaugeTotalFrames, gaugeTotalFrames - 1);
+
+      // Update frame directly for smooth linear progress
+      currentFrameRef.current = targetFrame;
+
+      // Update animation with decimal precision for smooth rendering
+      const animation = gaugeLottieRef.current;
+      if (animation.goToAndStop) {
+        // Use decimal frame value - Lottie supports sub-frame rendering
+        animation.goToAndStop(targetFrame, true);
+      }
+
+      // Continue animating at 60fps
+      animationFrameRef.current = requestAnimationFrame(animateProgress);
+    };
+
+    // Start animation if not already running
+    if (!animationFrameRef.current) {
+      animationFrameRef.current = requestAnimationFrame(animateProgress);
     }
-  }, [breathingStarted, currentSecond, config.totalDuration, gaugeTotalFrames]);
+
+    // Cleanup on unmount or when breathing stops
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+    };
+  }, [breathingStarted, config.totalDuration, gaugeTotalFrames]);
 
   const handleStart = () => {
     setCountdownPhase(3);
@@ -261,7 +322,14 @@ export function BreathingExercise({
     setCurrentSecond(0);
     setIsCountingDown(true);
     setAnimate(true);
+    // Reset start time
+    startTimeRef.current = 0;
     // Reset gauge animation to start
+    currentFrameRef.current = 0;
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
     if (gaugeLottieRef.current && gaugeLottieRef.current.goToAndStop) {
       gaugeLottieRef.current.goToAndStop(0, true);
     }
@@ -274,6 +342,14 @@ export function BreathingExercise({
     setCurrentSecond(0);
     setReadyDots([false, false, false]);
     setAnimate(false);
+    currentFrameRef.current = 0;
+    startTimeRef.current = 0;
+
+    // Cancel any ongoing animation
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
 
     audioGuideRef.current?.pause();
     audioCountdownRef.current?.pause();
@@ -370,6 +446,7 @@ export function BreathingExercise({
                         setGaugeTotalFrames(animation.renderer.totalFrames);
                       } else if (gaugeAnimationData && typeof gaugeAnimationData === 'object') {
                         // Fallback: get from animation data
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const data = gaugeAnimationData as any;
                         if (data.op && typeof data.op === 'number') {
                           setGaugeTotalFrames(data.op);
