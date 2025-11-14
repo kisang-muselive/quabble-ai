@@ -168,7 +168,7 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
               Mind Workouts
             </h1>
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-              Quabble's Mind Workout is a daily mental health exercise you can complete in just a few minutes. It fills the gaps between therapy sessions and is designed, based on scientific evidence, to ease stress, anxiety, and low mood. Simply put, it's a short daily workout for your mind.
+              Quabble&apos;s Mind Workout is a daily mental health exercise you can complete in just a few minutes. It fills the gaps between therapy sessions and is designed, based on scientific evidence, to ease stress, anxiety, and low mood. Simply put, it&apos;s a short daily workout for your mind.
             </p>
           </div>
 
@@ -398,15 +398,6 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
           </div>
         </div>
       </motion.section>
-
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="text-xs text-muted-foreground text-center mt-6"
-      >
-        Click any card to start your wellness practice
-      </motion.p>
     </div>
   );
 }
