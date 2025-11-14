@@ -479,10 +479,10 @@ export function BreathingExercise({
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center h-full w-full pt-4">
-        {/* Phase Instruction - Fixed height to prevent layout shift - Moved to top */}
-        <div className="text-center min-h-[100px] flex flex-col justify-center items-center mb-4">
+        {/* Phase Instruction - White, smaller, less spacing */}
+        <div className="text-center flex flex-col justify-center items-center mb-2">
           {isCountingDown && (
-            <div className="flex justify-center gap-2">
+            <div className="flex justify-center gap-2 mb-2">
               {readyDots.map((active, idx) => (
                 <motion.div
                   key={idx}
@@ -509,20 +509,19 @@ export function BreathingExercise({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.2 }}
-              className="text-4xl font-bold"
-              style={{ color: getPhaseColor(getCurrentPhaseText()) }}
+              className="text-2xl font-semibold text-white"
             >
               {getCurrentPhaseText()}
             </motion.p>
           )}
 
           {!isActive && (
-            <p className="text-3xl font-semibold text-foreground">Ready to Begin</p>
+            <p className="text-2xl font-semibold text-white">Ready to Begin</p>
           )}
         </div>
 
-        {/* Lottie Animations Container - Moved below phase text */}
-        <div className="relative flex items-center justify-center w-[375px] h-[375px] mb-6">
+        {/* Lottie Animations Container */}
+        <div className="relative flex items-center justify-center w-[375px] h-[375px] mb-4">
           {/* Semi-transparent white circle background */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-[269px] h-[269px] rounded-full bg-white/30" />
@@ -589,27 +588,31 @@ export function BreathingExercise({
           )}
         </div>
 
-        {/* Stats - Only show when active */}
-        {isActive && (
-          <div className="text-center min-h-[80px] flex flex-col justify-center items-center max-w-md mb-6">
-            <div className="flex justify-center gap-8 text-sm">
-              <div>
-                <p className="text-muted-foreground">Time</p>
-                <p className="text-xl font-semibold">
-                  {Math.floor(currentSecond / 60)}:{(currentSecond % 60).toString().padStart(2, "0")}
-                </p>
+        {/* Sets indicator - Below circular progress */}
+        {breathingStarted && (
+          <div className="text-center mb-2">
+            <p className="text-lg font-semibold text-foreground">
+              {getCurrentCycle() + 1}/{config.totalCycles}
+            </p>
+          </div>
+        )}
+
+        {/* Exercise name */}
+        <div className="text-center mb-4">
+          <p className="text-xl font-semibold text-foreground">
+            {exerciseType === "box" ? "Box breathing" : config.name}
+          </p>
+        </div>
+
+        {/* 4 Columns with phase information - Only for box breathing */}
+        {exerciseType === "box" && (
+          <div className="flex justify-center gap-4 w-full max-w-md px-4">
+            {config.breatheStatus.map((phase, index) => (
+              <div key={index} className="flex flex-col items-center flex-1">
+                <p className="text-lg font-semibold text-foreground mb-1">4s</p>
+                <p className="text-sm text-muted-foreground capitalize">{phase.toLowerCase()}</p>
               </div>
-              <div>
-                <p className="text-muted-foreground">Cycles</p>
-                <p className="text-xl font-semibold">{getCurrentCycle()}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Progress</p>
-                <p className="text-xl font-semibold">
-                  {Math.round((currentSecond / config.totalDuration) * 100)}%
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         )}
       </div>
