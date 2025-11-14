@@ -202,16 +202,16 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
               onClick={() => onExerciseClick("breathing")}
-              className="group relative w-full flex flex-col rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300 overflow-hidden p-4"
+              className="group relative w-full flex flex-col rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300 overflow-hidden p-4 cursor-pointer"
             >
               {/* Badge in top right corner */}
               <div className="absolute top-3 right-3 z-10">
-                <div className="w-6 h-6 flex items-center justify-center">
+                <div className="w-8 h-8 flex items-center justify-center">
                   <Image
                     src="/icons/play.png"
                     alt="Play"
-                    width={24}
-                    height={24}
+                    width={32}
+                    height={32}
                     className="object-contain"
                   />
                 </div>
@@ -245,16 +245,16 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.35 }}
               onClick={() => onExerciseClick("grounding-54321")}
-              className="group relative w-full flex flex-col rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300 overflow-hidden p-4"
+              className="group relative w-full flex flex-col rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300 overflow-hidden p-4 cursor-pointer"
             >
               {/* Badge in top right corner */}
               <div className="absolute top-3 right-3 z-10">
-                <div className="w-6 h-6 flex items-center justify-center">
+                <div className="w-8 h-8 flex items-center justify-center">
                   <Image
                     src="/icons/play.png"
                     alt="Play"
-                    width={24}
-                    height={24}
+                    width={32}
+                    height={32}
                     className="object-contain"
                   />
                 </div>
@@ -288,16 +288,16 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.4 }}
               onClick={() => onExerciseClick("yoga-stretch")}
-              className="group relative w-full flex flex-col rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300 overflow-hidden p-4"
+              className="group relative w-full flex flex-col rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300 overflow-hidden p-4 cursor-pointer"
             >
               {/* Badge in top right corner */}
               <div className="absolute top-3 right-3 z-10">
-                <div className="w-6 h-6 flex items-center justify-center">
+                <div className="w-8 h-8 flex items-center justify-center">
                   <Image
                     src="/icons/play.png"
                     alt="Play"
-                    width={24}
-                    height={24}
+                    width={32}
+                    height={32}
                     className="object-contain"
                   />
                 </div>
@@ -337,7 +337,7 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
       >
         <div className="max-w-4xl mx-auto">
           <h2 className="text-lg font-normal text-foreground mb-6">
-            All MindWorkouts in Quabble App
+            All Mind Workouts in Quabble App
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
         {exercises.map((exercise, index) => (
@@ -347,17 +347,17 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: index * 0.05 }}
             onClick={() => onExerciseClick(exercise.id)}
-            className="group relative w-full flex flex-col rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300 overflow-hidden p-4"
+            className="group relative w-full flex flex-col rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300 overflow-hidden p-4 cursor-pointer"
           >
             {/* Badge in top right corner */}
             <div className="absolute top-3 right-3 z-10">
               {exercise.hasPlayButton && (
-                <div className="w-6 h-6 flex items-center justify-center">
+                <div className="w-8 h-8 flex items-center justify-center">
                   <Image
                     src="/icons/play.png"
                     alt="Play"
-                    width={24}
-                    height={24}
+                    width={32}
+                    height={32}
                     className="object-contain"
                   />
                 </div>
