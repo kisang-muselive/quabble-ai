@@ -347,9 +347,18 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
         className="w-full mb-12 px-4"
       >
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-lg font-normal text-foreground mb-6">
-            All Mind Workouts in Quabble App
-          </h2>
+          <div className="flex flex-col gap-3 mb-6">
+            <Image
+              src="/icons/mobile-icon.png"
+              alt="Mobile"
+              width={40}
+              height={40}
+              className="object-contain"
+            />
+            <h2 className="text-lg font-normal text-foreground">
+              All Mind Workouts in Quabble App
+            </h2>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
         {exercises.map((exercise, index) => (
           <motion.button

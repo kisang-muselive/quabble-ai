@@ -28,6 +28,7 @@ const getCardImagePath = (exerciseId: string): string | null => {
     "moonlight": "/cards/workout_moonlight-EMfTmwj6.avif",
     "thank-you": "/cards/workout_thank-you-Dk937mN6.avif",
     "visualization": "/cards/workout_safe-place-CiTGwIKO.avif",
+    "pleasant-activities": "/cards/workout_pleasant-activities.png",
     "walking-meditation": "/cards/workout_outdoor-walk-CpUdl6dh.avif",
     "future-self": "/cards/workout_smart-goals-CsKNCryL.png",
     "worry-time": "/cards/workout_worry-box-BZAt6_Fl.avif",
