@@ -43,6 +43,7 @@ const EXERCISE_CONFIGS: Record<BreathingExerciseType, ExerciseConfig> = {
     totalDuration: 64,
     totalCycles: 4,
     breatheStatus: ["INHALE", "HOLD", "EXHALE", "HOLD"],
+    phaseDurations: [4, 4, 4, 4],
     cycleDuration: 16,
     tickMarks: [5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 57, 61],
     getPhaseAtSecond: (second: number) => {
@@ -61,17 +62,18 @@ const EXERCISE_CONFIGS: Record<BreathingExerciseType, ExerciseConfig> = {
     duckAnimation: "/workouts/breathing/breathing_duck_478.json",
     gaugeAnimation: "/workouts/breathing/breathing_gauge_478.json",
     audioGuide: "/workouts/breathing/breathing478.mp3",
-    audioCountdown: "/workouts/breathing/breathing_count.mp3",
+    audioCountdown: "/workouts/breeding_count.mp3",
     totalDuration: 57,
     totalCycles: 3,
     breatheStatus: ["INHALE", "HOLD", "EXHALE"],
+    phaseDurations: [4, 7, 8],
     cycleDuration: 19,
     tickMarks: [5, 12, 20, 24, 31, 39, 43, 50],
     getPhaseAtSecond: (second: number) => {
       const cyclePosition = second % 19;
       if (cyclePosition < 4) return 0; // INHALE
-      if (cyclePosition < 11) return 1; // HOLD
-      return 2; // EXHALE
+      if (cyclePosition < 11) return 1; // HOLD (4-11 = 7 seconds)
+      return 2; // EXHALE (11-19 = 8 seconds)
     },
   },
   "555": {
@@ -86,6 +88,7 @@ const EXERCISE_CONFIGS: Record<BreathingExerciseType, ExerciseConfig> = {
     totalDuration: 60,
     totalCycles: 4,
     breatheStatus: ["INHALE", "HOLD", "EXHALE"],
+    phaseDurations: [5, 5, 5],
     cycleDuration: 15,
     tickMarks: [6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 56],
     getPhaseAtSecond: (second: number) => {
@@ -299,7 +302,7 @@ export function BreathingExercise({
         return;
       }
 
-      // Calculate progress based on breathing phases (for box breathing: 4-4-4-4 pattern)
+      // Calculate progress based on breathing phases
       let progress = 0;
       
       if (exerciseType === "box") {
@@ -326,6 +329,53 @@ export function BreathingExercise({
         
         // Keep progress between 0 and 1 (it will naturally wrap due to modulo)
         progress = progress % 1;
+      } else if (exerciseType === "478") {
+        // 4-7-8 breathing: phase-based progress
+        // Phase 0 (INHALE 0-4s): 0-21.05% (4/19)
+        // Phase 1 (HOLD 4-11s): 21.05%-57.89% (7/19)
+        // Phase 2 (EXHALE 11-19s): 57.89%-100% (8/19)
+        
+        const cyclePosition = elapsedSeconds % config.cycleDuration; // 0-19 seconds within current cycle
+        
+        // Determine phase based on continuous time (not floored)
+        let phaseIndex: number;
+        let phaseStartTime: number;
+        let phaseDuration: number;
+        
+        if (cyclePosition < 4) {
+          // INHALE: 0-4s
+          phaseIndex = 0;
+          phaseStartTime = 0;
+          phaseDuration = 4;
+        } else if (cyclePosition < 11) {
+          // HOLD: 4-11s
+          phaseIndex = 1;
+          phaseStartTime = 4;
+          phaseDuration = 7;
+        } else {
+          // EXHALE: 11-19s
+          phaseIndex = 2;
+          phaseStartTime = 11;
+          phaseDuration = 8;
+        }
+        
+        // Calculate base progress (sum of previous phases)
+        const phaseDurations = [4, 7, 8];
+        const totalCycleDuration = 19;
+        let phaseBaseProgress = 0;
+        for (let i = 0; i < phaseIndex; i++) {
+          phaseBaseProgress += phaseDurations[i] / totalCycleDuration;
+        }
+        
+        // Calculate progress within current phase (0 to 1)
+        const timeInPhase = cyclePosition - phaseStartTime;
+        const phaseTimeProgress = Math.max(0, Math.min(timeInPhase, phaseDuration)) / phaseDuration;
+        
+        // Total progress: base + (current phase progress * phase duration ratio)
+        progress = phaseBaseProgress + (phaseTimeProgress * phaseDuration / totalCycleDuration);
+        
+        // Keep progress between 0 and 1
+        progress = progress % 1;
       } else {
         // For other breathing types, use linear progress
         progress = elapsedSeconds / config.totalDuration;
@@ -340,29 +390,32 @@ export function BreathingExercise({
         gaugeAnimation.goToAndStop(targetFrame, true);
       }
 
-      // Control duck animation - start it and adjust speed based on breathing phase
+      // Control duck animation - restart at each cycle and keep it playing
       if (duckLottieRef.current) {
         const duckAnimation = duckLottieRef.current;
-        
-        // Ensure duck animation is playing
-        if (duckAnimation.play) {
-          duckAnimation.play();
+
+        // Get current cycle
+        const currentCycle = Math.floor(elapsedSeconds / config.cycleDuration);
+
+        // Store the last cycle we were on (using a custom property)
+        if (typeof (duckAnimation as any)._lastCycle === 'undefined') {
+          (duckAnimation as any)._lastCycle = currentCycle;
         }
-        
-        // Adjust duck animation speed based on phase (for box breathing)
-        if (exerciseType === "box") {
-          const phaseIndex = config.getPhaseAtSecond(Math.floor(elapsedSeconds));
-          
-          // INHALE: faster (expanding), HOLD: slow/stop, EXHALE: faster (contracting), HOLD: slow/stop
-          if (duckAnimation.setSpeed) {
-            if (phaseIndex === 0 || phaseIndex === 2) {
-              // INHALE or EXHALE - animate faster
-              duckAnimation.setSpeed(1.5);
-            } else {
-              // HOLD phases - animate slower
-              duckAnimation.setSpeed(0.5);
-            }
+
+        // If we're in a new cycle, restart the duck animation
+        if (currentCycle !== (duckAnimation as any)._lastCycle) {
+          (duckAnimation as any)._lastCycle = currentCycle;
+          if (duckAnimation.goToAndPlay) {
+            duckAnimation.goToAndPlay(0, true);
           }
+        }
+
+        // Ensure duck animation is playing
+        if (duckAnimation.isPaused && duckAnimation.play) {
+          duckAnimation.play();
+        } else if (!duckAnimation.isPaused && duckAnimation.play) {
+          // Make sure it's playing
+          duckAnimation.play();
         }
       }
 
@@ -432,8 +485,8 @@ export function BreathingExercise({
   };
 
   const getCurrentCycle = () => {
-    if (!breathingStarted) return 0;
-    return Math.floor(currentSecond / config.cycleDuration);
+    if (!breathingStarted) return 1;
+    return Math.floor(currentSecond / config.cycleDuration) + 1;
   };
 
   const getCurrentPhaseText = () => {
@@ -604,15 +657,29 @@ export function BreathingExercise({
           </p>
         </div>
 
-        {/* 4 Columns with phase information - Only for box breathing */}
-        {exerciseType === "box" && (
+        {/* Phase information columns - For box and 478 breathing */}
+        {(exerciseType === "box" || exerciseType === "478") && (
           <div className="flex justify-center gap-4 w-full max-w-md px-4">
-            {config.breatheStatus.map((phase, index) => (
-              <div key={index} className="flex flex-col items-center flex-1">
-                <p className="text-lg font-semibold mb-1" style={{ color: "#46728C" }}>4s</p>
-                <p className="text-sm capitalize" style={{ color: "#46728C" }}>{phase.toLowerCase()}</p>
-              </div>
-            ))}
+            {config.breatheStatus.map((phase, index) => {
+              // Get duration for each phase
+              let duration = "4s";
+              if (exerciseType === "478") {
+                // 4-7-8 breathing: 4s inhale, 7s hold, 8s exhale
+                if (index === 0) duration = "4s"; // INHALE
+                else if (index === 1) duration = "7s"; // HOLD
+                else duration = "8s"; // EXHALE
+              } else {
+                // Box breathing: all phases are 4s
+                duration = "4s";
+              }
+              
+              return (
+                <div key={index} className="flex flex-col items-center flex-1">
+                  <p className="text-lg font-semibold mb-1" style={{ color: "#46728C" }}>{duration}</p>
+                  <p className="text-sm capitalize" style={{ color: "#46728C" }}>{phase.toLowerCase()}</p>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
