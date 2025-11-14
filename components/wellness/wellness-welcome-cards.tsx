@@ -186,15 +186,160 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
         </div>
       </motion.section>
 
-      <motion.h3
-        initial={{ opacity: 0, y: 10 }}
+      {/* Available on Web Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-xl font-semibold text-center mb-6 text-foreground"
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="w-full mb-12 px-4"
       >
-        Choose a workout to boost your mental health
-      </motion.h3>
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-lg font-normal text-foreground mb-6">Available on Web</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
+            {/* 1 min Breathing Card */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 }}
+              onClick={() => onExerciseClick("breathing")}
+              className="group relative w-full flex flex-col rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300 overflow-hidden p-4"
+            >
+              {/* Badge in top right corner */}
+              <div className="absolute top-3 right-3 z-10">
+                <div className="w-6 h-6 flex items-center justify-center">
+                  <Image
+                    src="/icons/play.png"
+                    alt="Play"
+                    width={24}
+                    height={24}
+                    className="object-contain"
+                  />
+                </div>
+              </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full px-4 max-w-4xl mx-auto">
+              {/* Icon at top left */}
+              <div className="flex items-start justify-start mb-3 h-12">
+                <Image
+                  src="/icons/workout-icon_1-minute-breathing.png"
+                  alt="1 min Breathing"
+                  width={48}
+                  height={48}
+                  className="object-contain"
+                />
+              </div>
+
+              {/* Title */}
+              <h4 className="font-semibold text-base text-foreground group-hover:text-primary transition-colors mb-2 text-left">
+                1 min Breathing
+              </h4>
+
+              {/* Description */}
+              <p className="text-sm text-muted-foreground leading-snug text-left">
+                One-minute fun breathing exercise to relax
+              </p>
+            </motion.button>
+
+            {/* 54321 Card */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.35 }}
+              onClick={() => onExerciseClick("grounding-54321")}
+              className="group relative w-full flex flex-col rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300 overflow-hidden p-4"
+            >
+              {/* Badge in top right corner */}
+              <div className="absolute top-3 right-3 z-10">
+                <div className="w-6 h-6 flex items-center justify-center">
+                  <Image
+                    src="/icons/play.png"
+                    alt="Play"
+                    width={24}
+                    height={24}
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+
+              {/* Icon at top left */}
+              <div className="flex items-start justify-start mb-3 h-12">
+                <Image
+                  src="/icons/workout-icon_54321.png"
+                  alt="54321"
+                  width={48}
+                  height={48}
+                  className="object-contain"
+                />
+              </div>
+
+              {/* Title */}
+              <h4 className="font-semibold text-base text-foreground group-hover:text-primary transition-colors mb-2 text-left">
+                54321
+              </h4>
+
+              {/* Description */}
+              <p className="text-sm text-muted-foreground leading-snug text-left">
+                Practice this simple and effective grounding method regularly to manage stress and anxiety better
+              </p>
+            </motion.button>
+
+            {/* Watermelon Tai-Chi Card */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4 }}
+              onClick={() => onExerciseClick("yoga-stretch")}
+              className="group relative w-full flex flex-col rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300 overflow-hidden p-4"
+            >
+              {/* Badge in top right corner */}
+              <div className="absolute top-3 right-3 z-10">
+                <div className="w-6 h-6 flex items-center justify-center">
+                  <Image
+                    src="/icons/play.png"
+                    alt="Play"
+                    width={24}
+                    height={24}
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+
+              {/* Icon at top left */}
+              <div className="flex items-start justify-start mb-3 h-12">
+                <Image
+                  src="/icons/workout-icon_watermelon-tai-chi.png"
+                  alt="Watermelon Tai-Chi"
+                  width={48}
+                  height={48}
+                  className="object-contain"
+                />
+              </div>
+
+              {/* Title */}
+              <h4 className="font-semibold text-base text-foreground group-hover:text-primary transition-colors mb-2 text-left">
+                Watermelon Tai-Chi
+              </h4>
+
+              {/* Description */}
+              <p className="text-sm text-muted-foreground leading-snug text-left">
+                Fun Tai-chi movements to follow for mind and body balance
+              </p>
+            </motion.button>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* All MindWorkouts Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        className="w-full mb-12 px-4"
+      >
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-lg font-normal text-foreground mb-6">
+            All MindWorkouts in Quabble App
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
         {exercises.map((exercise, index) => (
           <motion.button
             key={exercise.id}
@@ -250,7 +395,9 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
             </p>
           </motion.button>
         ))}
-      </div>
+          </div>
+        </div>
+      </motion.section>
 
       <motion.p
         initial={{ opacity: 0 }}
