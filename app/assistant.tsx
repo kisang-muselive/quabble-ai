@@ -53,8 +53,8 @@ const AssistantContent = () => {
                 <Separator orientation="vertical" className="h-4" />
               </div> */}
 
-              {/* Center - Quabble text only (without icon) */}
-              <div className="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
+              {/* Quabble text - left on mobile, centered on desktop */}
+              <div className="flex items-center gap-2 md:absolute md:left-1/2 md:-translate-x-1/2">
                 {/* <Image
                   src="/quabble-duck.png"
                   alt="Quabble"
