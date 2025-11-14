@@ -18,7 +18,6 @@ import { WellnessModal } from "@/components/wellness/wellness-modal";
 import { RoutineCheckinModal } from "@/components/wellness/routine-checkin-modal";
 import { Button } from "@/components/ui/button";
 import { ClipboardCheck } from "lucide-react";
-import Image from "next/image";
 
 const AssistantContent = () => {
   const {
@@ -42,22 +41,55 @@ const AssistantContent = () => {
           <ThreadListSidebar />
           <SidebarInset>
             <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-              <div className="flex items-center gap-2">
+              {/* Original left sidebar toggle - commented out */}
+              {/* <div className="flex items-center gap-2">
                 <SidebarTrigger />
                 <Separator orientation="vertical" className="h-4" />
-              </div>
+              </div> */}
+
+              {/* Center - Quabble text only (without icon) */}
               <div className="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
-                <Image
+                {/* <Image
                   src="/quabble-duck.png"
                   alt="Quabble"
                   width={32}
                   height={32}
                   priority
                   className="rounded-lg"
-                />
-                <span className="text-lg font-semibold">Quabble</span>
+                /> */}
+                <span className="text-2xl font-semibold">Quabble</span>
               </div>
-              <div className="ml-auto">
+
+              {/* Right side - iOS and Android download badges */}
+              <div className="ml-auto flex items-center gap-3">
+                <a
+                  href="https://apps.apple.com/us/app/quabble-daily-mental-health/id6445948886"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block hover:opacity-80 transition-opacity h-8"
+                >
+                  <img
+                    src="/appstore.png"
+                    alt="Download on the App Store"
+                    className="h-8 w-auto object-contain"
+                  />
+                </a>
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.museLIVE.quabbleapp&hl=en_US"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block hover:opacity-80 transition-opacity h-8"
+                >
+                  <img
+                    src="/google.png"
+                    alt="Get it on Google Play"
+                    className="h-8 w-auto object-contain"
+                  />
+                </a>
+              </div>
+
+              {/* Original Routine Check-in button - commented out */}
+              {/* <div className="ml-auto">
                 <Button
                   onClick={openRoutineCheckinModal}
                   size="sm"
@@ -66,7 +98,7 @@ const AssistantContent = () => {
                   <ClipboardCheck className="h-4 w-4" />
                   Routine Check-in
                 </Button>
-              </div>
+              </div> */}
             </header>
             <div className="flex-1 overflow-hidden">
               <Thread />
