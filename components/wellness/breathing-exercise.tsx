@@ -26,6 +26,7 @@ interface ExerciseConfig {
   totalDuration: number; // in seconds
   totalCycles: number;
   breatheStatus: string[];
+  phaseDurations: number[]; // duration in seconds for each phase
   cycleDuration: number; // total seconds per cycle
   tickMarks: number[]; // seconds when text changes
   getPhaseAtSecond: (second: number) => number; // returns phase index
