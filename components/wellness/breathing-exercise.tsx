@@ -520,7 +520,9 @@ export function BreathingExercise({
 
   const getCurrentPhaseText = () => {
     const phaseIdx = getCurrentPhaseIndex();
-    return config.breatheStatus[phaseIdx];
+    const phaseText = config.breatheStatus[phaseIdx];
+    // Convert to title case (first letter capitalized, rest lowercase)
+    return phaseText.charAt(0) + phaseText.slice(1).toLowerCase();
   };
 
   const isActive = isCountingDown || breathingStarted;
@@ -602,8 +604,9 @@ export function BreathingExercise({
                     opacity: active ? 1 : 0.3,
                   }}
                   transition={{ duration: 0.3 }}
-                  className="w-4 h-4 rounded-full bg-white"
+                  className="w-4 h-4 rounded-full"
                   style={{
+                    backgroundColor: "#46728C",
                     opacity: active ? 1 : 0.3,
                   }}
                 />
@@ -617,7 +620,8 @@ export function BreathingExercise({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.2 }}
-              className="text-2xl font-semibold text-white h-[32px] flex items-center"
+              className="text-2xl font-semibold h-[32px] flex items-center"
+              style={{ color: "#46728C" }}
             >
               {getCurrentPhaseText()}
             </motion.p>

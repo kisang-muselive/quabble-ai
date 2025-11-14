@@ -162,7 +162,7 @@ export function WellnessModal({
                       color: "#46728C"
                     }}
                   >
-                    3 Set
+                    3 Sets
                   </Button>
                 </div>
                 <button
