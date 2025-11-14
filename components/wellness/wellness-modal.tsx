@@ -146,16 +146,21 @@ export function WellnessModal({
                   className="p-2 rounded-full hover:bg-white/20 transition-colors"
                   aria-label="Previous technique"
                 >
-                  <ChevronLeft className="w-6 h-6 text-white" />
+                  <ChevronLeft className="w-6 h-6" style={{ color: "#46728C" }} />
                 </button>
                 <div className="text-center min-w-[200px]">
-                  <p className="text-2xl font-semibold mb-2 text-white">
+                  <p className="text-2xl font-semibold mb-2" style={{ color: "#46728C" }}>
                     {currentTechnique?.displayName}
                   </p>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="rounded-full bg-white/20 border-white/30 text-white hover:bg-white/30"
+                    className="rounded-full border-white/30 hover:bg-white/30"
+                    style={{ 
+                      backgroundColor: "rgba(70, 114, 140, 0.2)",
+                      borderColor: "#46728C",
+                      color: "#46728C"
+                    }}
                   >
                     3 Set
                   </Button>
@@ -165,7 +170,7 @@ export function WellnessModal({
                   className="p-2 rounded-full hover:bg-white/20 transition-colors"
                   aria-label="Next technique"
                 >
-                  <ChevronRight className="w-6 h-6 text-white" />
+                  <ChevronRight className="w-6 h-6" style={{ color: "#46728C" }} />
                 </button>
               </div>
 

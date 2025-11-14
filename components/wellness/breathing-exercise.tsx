@@ -534,8 +534,10 @@ export function BreathingExercise({
         backgroundPosition: "center",
       }}
     >
-      {/* Semi-transparent overlay - full coverage */}
-      <div className="absolute inset-0 bg-white/70 w-full h-full" />
+      {/* Semi-transparent overlay - full coverage - hidden on completion screen */}
+      {!isCompleted && (
+        <div className="absolute inset-0 bg-white/70 w-full h-full" />
+      )}
 
       {/* Close button */}
       <button
@@ -548,23 +550,38 @@ export function BreathingExercise({
 
       {/* Completion Screen */}
       {isCompleted ? (
-        <div className="relative z-10 flex flex-col items-center justify-center h-full w-full">
-          <h2 className="text-4xl font-bold text-foreground mb-2">Well done</h2>
-          <p className="text-lg text-muted-foreground mb-8">Wishing you a perfect day!</p>
+        <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-6 py-8">
+          {/* Title */}
+          <h2 className="text-3xl font-normal mb-2 text-white">
+            Well done
+          </h2>
+          <p className="text-base mb-8 text-center text-white/90">
+            Wishing you a perfect day!
+          </p>
 
-          <div className="mb-8">
+          {/* Duck and Cloud Illustration */}
+          <div className="relative w-[280px] h-[280px] mb-4 flex items-center justify-center">
+            <Image
+              src="/workouts/breathing/breathing_cloud.svg"
+              alt="Cloud"
+              width={279}
+              height={232}
+              className="absolute z-0"
+            />
             <Image
               src="/workouts/breathing/breathing_duck.svg"
               alt="Duck"
               width={223}
               height={176}
+              className="absolute z-10"
             />
           </div>
 
+          {/* Start again Button */}
           <Button
             onClick={handleRestart}
             size="lg"
-            className="min-w-[200px] bg-primary hover:bg-primary/90"
+            className="w-full max-w-[320px] rounded-full text-lg font-semibold py-6 bg-black hover:bg-gray-900 text-white shadow-lg cursor-pointer"
           >
             Start again
           </Button>
