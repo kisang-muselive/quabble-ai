@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import Lottie from "lottie-react";
+import Image from "next/image";
 
 export type BreathingExerciseType = "box" | "478" | "555";
 
@@ -40,12 +41,12 @@ const EXERCISE_CONFIGS: Record<BreathingExerciseType, ExerciseConfig> = {
     gaugeAnimation: "/workouts/breathing/breathing_gauge.json",
     audioGuide: "/workouts/breathing/box_breathing.mp3",
     audioCountdown: "/workouts/breathing/breathing_count.mp3",
-    totalDuration: 64,
-    totalCycles: 4,
+    totalDuration: 48,
+    totalCycles: 3,
     breatheStatus: ["INHALE", "HOLD", "EXHALE", "HOLD"],
     phaseDurations: [4, 4, 4, 4],
     cycleDuration: 16,
-    tickMarks: [5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 57, 61],
+    tickMarks: [5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45],
     getPhaseAtSecond: (second: number) => {
       const cyclePosition = second % 16;
       if (cyclePosition < 4) return 0; // INHALE
@@ -85,12 +86,12 @@ const EXERCISE_CONFIGS: Record<BreathingExerciseType, ExerciseConfig> = {
     gaugeAnimation: "/workouts/breathing/breathing_gauge_555.json",
     audioGuide: "/workouts/breathing/breathing555.mp3",
     audioCountdown: "/workouts/breathing/breathing_count.mp3",
-    totalDuration: 60,
-    totalCycles: 4,
+    totalDuration: 45,
+    totalCycles: 3,
     breatheStatus: ["INHALE", "HOLD", "EXHALE"],
     phaseDurations: [5, 5, 5],
     cycleDuration: 15,
-    tickMarks: [6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 56],
+    tickMarks: [6, 11, 16, 21, 26, 31, 36, 41],
     getPhaseAtSecond: (second: number) => {
       const cyclePosition = second % 15;
       if (cyclePosition < 5) return 0; // INHALE
@@ -113,6 +114,7 @@ export function BreathingExercise({
   const [currentSecond, setCurrentSecond] = useState(0);
   const [animate, setAnimate] = useState(true);
   const [readyDots, setReadyDots] = useState([false, false, false]);
+  const [isCompleted, setIsCompleted] = useState(false);
   const startTimeRef = useRef<number>(0);
 
   // Audio refs
@@ -237,10 +239,10 @@ export function BreathingExercise({
     if (!breathingStarted) return;
 
     if (currentSecond >= config.totalDuration) {
-      // Exercise complete
+      // Exercise complete - show completion screen
       setBreathingStarted(false);
+      setIsCompleted(true);
       audioGuideRef.current?.pause();
-      onComplete?.();
       return;
     }
 
@@ -376,6 +378,53 @@ export function BreathingExercise({
         
         // Keep progress between 0 and 1
         progress = progress % 1;
+      } else if (exerciseType === "555") {
+        // 5-5-5 breathing: phase-based progress
+        // Phase 0 (INHALE 0-5s): 0-33.33% (5/15)
+        // Phase 1 (HOLD 5-10s): 33.33%-66.67% (5/15)
+        // Phase 2 (EXHALE 10-15s): 66.67%-100% (5/15)
+
+        const cyclePosition = elapsedSeconds % config.cycleDuration; // 0-15 seconds within current cycle
+
+        // Determine phase based on continuous time
+        let phaseIndex: number;
+        let phaseStartTime: number;
+        let phaseDuration: number;
+
+        if (cyclePosition < 5) {
+          // INHALE: 0-5s
+          phaseIndex = 0;
+          phaseStartTime = 0;
+          phaseDuration = 5;
+        } else if (cyclePosition < 10) {
+          // HOLD: 5-10s
+          phaseIndex = 1;
+          phaseStartTime = 5;
+          phaseDuration = 5;
+        } else {
+          // EXHALE: 10-15s
+          phaseIndex = 2;
+          phaseStartTime = 10;
+          phaseDuration = 5;
+        }
+
+        // Calculate base progress (sum of previous phases)
+        const phaseDurations = [5, 5, 5];
+        const totalCycleDuration = 15;
+        let phaseBaseProgress = 0;
+        for (let i = 0; i < phaseIndex; i++) {
+          phaseBaseProgress += phaseDurations[i] / totalCycleDuration;
+        }
+
+        // Calculate progress within current phase (0 to 1)
+        const timeInPhase = cyclePosition - phaseStartTime;
+        const phaseTimeProgress = Math.max(0, Math.min(timeInPhase, phaseDuration)) / phaseDuration;
+
+        // Total progress: base + (current phase progress * phase duration ratio)
+        progress = phaseBaseProgress + (phaseTimeProgress * phaseDuration / totalCycleDuration);
+
+        // Keep progress between 0 and 1
+        progress = progress % 1;
       } else {
         // For other breathing types, use linear progress
         progress = elapsedSeconds / config.totalDuration;
@@ -478,6 +527,24 @@ export function BreathingExercise({
     if (audioCountdownRef.current) audioCountdownRef.current.currentTime = 0;
   };
 
+  const handleRestart = () => {
+    setIsCompleted(false);
+    setCountdownPhase(3);
+    setReadyDots([false, false, false]);
+    setCurrentSecond(0);
+    setIsCountingDown(true);
+    setAnimate(true);
+    startTimeRef.current = 0;
+    currentFrameRef.current = 0;
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    if (gaugeLottieRef.current && gaugeLottieRef.current.goToAndStop) {
+      gaugeLottieRef.current.goToAndStop(0, true);
+    }
+  };
+
   // Get current phase and cycle
   const getCurrentPhaseIndex = () => {
     if (!breathingStarted) return 0;
@@ -527,15 +594,39 @@ export function BreathingExercise({
         className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
         aria-label="Close exercise"
       >
-        <X className="w-6 h-6 text-foreground" />
+        <X className="w-6 h-6 text-white" />
       </button>
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center h-full w-full pt-4">
+      {/* Completion Screen */}
+      {isCompleted ? (
+        <div className="relative z-10 flex flex-col items-center justify-center h-full w-full">
+          <h2 className="text-4xl font-bold text-foreground mb-2">Well done</h2>
+          <p className="text-lg text-muted-foreground mb-8">Wishing you a perfect day!</p>
+
+          <div className="mb-8">
+            <Image
+              src="/workouts/breathing/breathing_duck.svg"
+              alt="Duck"
+              width={223}
+              height={176}
+            />
+          </div>
+
+          <Button
+            onClick={handleRestart}
+            size="lg"
+            className="min-w-[200px] bg-primary hover:bg-primary/90"
+          >
+            Start again
+          </Button>
+        </div>
+      ) : (
+        /* Exercise Content */
+        <div className="relative z-10 flex flex-col items-center h-full w-full pt-4">
         {/* Phase Instruction - White, smaller, less spacing */}
-        <div className="text-center flex flex-col justify-center items-center mb-2">
+        <div className="text-center h-[32px] flex flex-col justify-center items-center mb-2">
           {isCountingDown && (
-            <div className="flex justify-center gap-2 mb-2">
+            <div className="flex justify-center gap-2 h-[32px] items-center">
               {readyDots.map((active, idx) => (
                 <motion.div
                   key={idx}
@@ -545,11 +636,9 @@ export function BreathingExercise({
                     opacity: active ? 1 : 0.3,
                   }}
                   transition={{ duration: 0.3 }}
-                  className="w-4 h-4 rounded-full"
+                  className="w-4 h-4 rounded-full bg-white"
                   style={{
-                    backgroundColor: active
-                      ? getPhaseColor(config.breatheStatus[0])
-                      : "#ccc",
+                    opacity: active ? 1 : 0.3,
                   }}
                 />
               ))}
@@ -562,19 +651,19 @@ export function BreathingExercise({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.2 }}
-              className="text-2xl font-semibold text-white"
+              className="text-2xl font-semibold text-white h-[32px] flex items-center"
             >
               {getCurrentPhaseText()}
             </motion.p>
           )}
 
           {!isActive && (
-            <p className="text-2xl font-semibold text-white">Ready to Begin</p>
+            <p className="text-2xl font-semibold text-white h-[32px] flex items-center">Ready to Begin</p>
           )}
         </div>
 
         {/* Lottie Animations Container */}
-        <div className="relative flex items-center justify-center w-[375px] h-[375px] mb-4">
+        <div className="relative flex items-center justify-center w-[375px] h-[375px]">
           {/* Semi-transparent white circle background */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-[269px] h-[269px] rounded-full bg-white/30" />
@@ -642,37 +731,30 @@ export function BreathingExercise({
         </div>
 
         {/* Sets indicator - Below circular progress */}
-        {breathingStarted && (
-          <div className="text-center mb-2">
+        {(isCountingDown || breathingStarted) && (
+          <div className="text-center mb-1">
             <p className="text-lg font-semibold" style={{ color: "#46728C" }}>
-              {getCurrentCycle() + 1}/{config.totalCycles}
+              {breathingStarted ? `${getCurrentCycle()}/${config.totalCycles}` : `0/${config.totalCycles}`}
             </p>
           </div>
         )}
 
         {/* Exercise name */}
-        <div className="text-center mb-4">
-          <p className="text-xl font-semibold" style={{ color: "#46728C" }}>
-            {exerciseType === "box" ? "Box breathing" : config.name}
-          </p>
-        </div>
+        {(isCountingDown || breathingStarted) && (
+          <div className="text-center mb-6">
+            <p className="text-xl font-semibold" style={{ color: "#46728C" }}>
+              {exerciseType === "box" ? "Box breathing" : config.name}
+            </p>
+          </div>
+        )}
 
-        {/* Phase information columns - For box and 478 breathing */}
-        {(exerciseType === "box" || exerciseType === "478") && (
+        {/* Phase information columns - For all breathing exercises */}
+        {(isCountingDown || breathingStarted) && (
           <div className="flex justify-center gap-4 w-full max-w-md px-4">
             {config.breatheStatus.map((phase, index) => {
-              // Get duration for each phase
-              let duration = "4s";
-              if (exerciseType === "478") {
-                // 4-7-8 breathing: 4s inhale, 7s hold, 8s exhale
-                if (index === 0) duration = "4s"; // INHALE
-                else if (index === 1) duration = "7s"; // HOLD
-                else duration = "8s"; // EXHALE
-              } else {
-                // Box breathing: all phases are 4s
-                duration = "4s";
-              }
-              
+              // Get duration for each phase using phaseDurations
+              const duration = `${config.phaseDurations[index]}s`;
+
               return (
                 <div key={index} className="flex flex-col items-center flex-1">
                   <p className="text-lg font-semibold mb-1" style={{ color: "#46728C" }}>{duration}</p>
@@ -682,7 +764,8 @@ export function BreathingExercise({
             })}
           </div>
         )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -121,15 +121,15 @@ export function WellnessModal({
             {/* Content */}
             <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-6 py-8">
               {/* Title */}
-              <h2 className="text-4xl font-bold mb-2" style={{ color: selectedTechnique === "555" ? "white" : selectedTechnique === "478" ? "white" : "#64B5F6" }}>
+              <h2 className="text-3xl font-bold mb-2 text-white">
                 1 min Breathing
               </h2>
-              <p className="text-base mb-8 text-center" style={{ color: selectedTechnique === "555" ? "rgba(255,255,255,0.9)" : selectedTechnique === "478" ? "rgba(255,255,255,0.9)" : "#90CAF9" }}>
+              <p className="text-base mb-8 text-center text-white/90">
                 Just 60 seconds to calm your thoughts and stay grounded.
               </p>
 
               {/* Duck and Cloud Illustration */}
-              <div className="relative w-[280px] h-[280px] mb-8 flex items-center justify-center">
+              <div className="relative w-[280px] h-[280px] mb-4 flex items-center justify-center">
                 <Image
                   src="/workouts/breathing/breathing_cloud.svg"
                   alt="Cloud"
@@ -147,7 +147,7 @@ export function WellnessModal({
               </div>
 
               {/* Technique Selection */}
-              <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="flex items-center justify-center gap-4 mb-8">
                 <button
                   onClick={handlePrevious}
                   className="p-2 rounded-full hover:bg-white/20 transition-colors"
@@ -180,7 +180,7 @@ export function WellnessModal({
               <Button
                 onClick={handleBegin}
                 size="lg"
-                className="w-full max-w-[320px] rounded-full text-lg font-semibold py-6 bg-white hover:bg-gray-100 text-black shadow-lg"
+                className="w-full max-w-[320px] rounded-full text-lg font-semibold py-6 bg-black hover:bg-gray-900 text-white shadow-lg"
               >
                 Begin
               </Button>
