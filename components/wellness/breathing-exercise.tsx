@@ -540,7 +540,7 @@ export function BreathingExercise({
       {/* Close button */}
       <button
         onClick={onComplete}
-        className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+        className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors cursor-pointer"
         aria-label="Close exercise"
       >
         <X className="w-6 h-6 text-white" />

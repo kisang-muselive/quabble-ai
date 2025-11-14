@@ -85,7 +85,7 @@ export function WellnessModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md h-[85vh] max-h-[900px] p-0 overflow-hidden border-0 rounded-lg sm:rounded-lg" showCloseButton={false}>
+      <DialogContent className="max-w-md h-[85vh] max-h-[700px] p-0 overflow-hidden border-0 rounded-lg sm:rounded-lg" showCloseButton={false}>
         {!isExerciseStarted ? (
           // Selection Screen
           <div className="relative h-full flex flex-col">
@@ -106,7 +106,7 @@ export function WellnessModal({
             {/* Close button */}
             <button
               onClick={() => onOpenChange(false)}
-              className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+              className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors cursor-pointer"
             >
               <X className="w-6 h-6 text-white" />
             </button>
@@ -173,7 +173,7 @@ export function WellnessModal({
               <Button
                 onClick={handleBegin}
                 size="lg"
-                className="w-full max-w-[320px] rounded-full text-lg font-semibold py-6 bg-black hover:bg-gray-900 text-white shadow-lg"
+                className="w-full max-w-[320px] rounded-full text-lg font-semibold py-6 bg-black hover:bg-gray-900 text-white shadow-lg cursor-pointer"
               >
                 Begin
               </Button>
