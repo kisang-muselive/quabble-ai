@@ -591,7 +591,7 @@ export function BreathingExercise({
         {/* Sets indicator - Below circular progress */}
         {breathingStarted && (
           <div className="text-center mb-2">
-            <p className="text-lg font-semibold text-foreground">
+            <p className="text-lg font-semibold" style={{ color: "#46728C" }}>
               {getCurrentCycle() + 1}/{config.totalCycles}
             </p>
           </div>
@@ -599,7 +599,7 @@ export function BreathingExercise({
 
         {/* Exercise name */}
         <div className="text-center mb-4">
-          <p className="text-xl font-semibold text-foreground">
+          <p className="text-xl font-semibold" style={{ color: "#46728C" }}>
             {exerciseType === "box" ? "Box breathing" : config.name}
           </p>
         </div>
@@ -609,8 +609,8 @@ export function BreathingExercise({
           <div className="flex justify-center gap-4 w-full max-w-md px-4">
             {config.breatheStatus.map((phase, index) => (
               <div key={index} className="flex flex-col items-center flex-1">
-                <p className="text-lg font-semibold text-foreground mb-1">4s</p>
-                <p className="text-sm text-muted-foreground capitalize">{phase.toLowerCase()}</p>
+                <p className="text-lg font-semibold mb-1" style={{ color: "#46728C" }}>4s</p>
+                <p className="text-sm capitalize" style={{ color: "#46728C" }}>{phase.toLowerCase()}</p>
               </div>
             ))}
           </div>
