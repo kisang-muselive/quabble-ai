@@ -111,17 +111,10 @@ export function WellnessModal({
               <X className="w-6 h-6 text-white" />
             </button>
 
-            {/* Info button */}
-            <button
-              className="absolute top-4 left-4 z-20 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 transition-colors flex items-center justify-center"
-            >
-              <span className="text-white text-sm font-semibold">i</span>
-            </button>
-
             {/* Content */}
             <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-6 py-8">
               {/* Title */}
-              <h2 className="text-3xl font-bold mb-2 text-white">
+              <h2 className="text-3xl font-normal mb-2 text-white">
                 1 min Breathing
               </h2>
               <p className="text-base mb-8 text-center text-white/90">
