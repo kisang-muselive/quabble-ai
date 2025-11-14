@@ -112,7 +112,6 @@ export function BreathingExercise({
   const [isCountingDown, setIsCountingDown] = useState(false);
   const [breathingStarted, setBreathingStarted] = useState(false);
   const [currentSecond, setCurrentSecond] = useState(0);
-  const [animate, setAnimate] = useState(true);
   const [readyDots, setReadyDots] = useState([false, false, false]);
   const [isCompleted, setIsCompleted] = useState(false);
   const startTimeRef = useRef<number>(0);
@@ -447,12 +446,16 @@ export function BreathingExercise({
         const currentCycle = Math.floor(elapsedSeconds / config.cycleDuration);
 
         // Store the last cycle we were on (using a custom property)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (typeof (duckAnimation as any)._lastCycle === 'undefined') {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (duckAnimation as any)._lastCycle = currentCycle;
         }
 
         // If we're in a new cycle, restart the duck animation
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (currentCycle !== (duckAnimation as any)._lastCycle) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (duckAnimation as any)._lastCycle = currentCycle;
           if (duckAnimation.goToAndPlay) {
             duckAnimation.goToAndPlay(0, true);
@@ -486,47 +489,6 @@ export function BreathingExercise({
     };
   }, [breathingStarted, config.totalDuration, config.totalCycles, config.cycleDuration, gaugeTotalFrames, exerciseType, config]);
 
-  const handleStart = () => {
-    setCountdownPhase(3);
-    setReadyDots([false, false, false]);
-    setCurrentSecond(0);
-    setIsCountingDown(true);
-    setAnimate(true);
-    // Reset start time
-    startTimeRef.current = 0;
-    // Reset gauge animation to start
-    currentFrameRef.current = 0;
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
-    }
-    if (gaugeLottieRef.current && gaugeLottieRef.current.goToAndStop) {
-      gaugeLottieRef.current.goToAndStop(0, true);
-    }
-  };
-
-  const handleStop = () => {
-    setIsCountingDown(false);
-    setBreathingStarted(false);
-    setCountdownPhase(3);
-    setCurrentSecond(0);
-    setReadyDots([false, false, false]);
-    setAnimate(false);
-    currentFrameRef.current = 0;
-    startTimeRef.current = 0;
-
-    // Cancel any ongoing animation
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
-    }
-
-    audioGuideRef.current?.pause();
-    audioCountdownRef.current?.pause();
-    if (audioGuideRef.current) audioGuideRef.current.currentTime = 0;
-    if (audioCountdownRef.current) audioCountdownRef.current.currentTime = 0;
-  };
-
   const handleRestart = () => {
     setIsCompleted(false);
     setCountdownPhase(3);
@@ -559,19 +521,6 @@ export function BreathingExercise({
   const getCurrentPhaseText = () => {
     const phaseIdx = getCurrentPhaseIndex();
     return config.breatheStatus[phaseIdx];
-  };
-
-  const getPhaseColor = (phase: string) => {
-    switch (phase) {
-      case "INHALE":
-        return "oklch(0.68 0.14 50)"; // Warm orange
-      case "HOLD":
-        return "oklch(0.88 0.06 60)"; // Soft peach
-      case "EXHALE":
-        return "oklch(0.52 0.08 145)"; // Sage green
-      default:
-        return "oklch(0.68 0.14 50)";
-    }
   };
 
   const isActive = isCountingDown || breathingStarted;
