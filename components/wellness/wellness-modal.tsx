@@ -31,7 +31,7 @@ export function WellnessModal({
   onOpenChange,
   exerciseId = "breathing",
 }: WellnessModalProps) {
-  const [selectedTechnique, setSelectedTechnique] = useState<BreathingExerciseType>("478");
+  const [selectedTechnique, setSelectedTechnique] = useState<BreathingExerciseType>("box");
   const [isExerciseStarted, setIsExerciseStarted] = useState(false);
   const [exerciseKey, setExerciseKey] = useState(0);
 
@@ -46,11 +46,11 @@ export function WellnessModal({
           case "box-breathing":
             return "box";
           case "breathing":
-            return "478";
+            return "box";
           case "555-breathing":
             return "555";
           default:
-            return "478";
+            return "box";
         }
       };
       setSelectedTechnique(getBreathingExerciseType(exerciseId));
