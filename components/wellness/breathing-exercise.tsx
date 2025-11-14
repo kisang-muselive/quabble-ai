@@ -496,7 +496,6 @@ export function BreathingExercise({
     setReadyDots([false, false, false]);
     setCurrentSecond(0);
     setIsCountingDown(true);
-    setAnimate(true);
     startTimeRef.current = 0;
     currentFrameRef.current = 0;
     if (animationFrameRef.current) {
