@@ -16,6 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { WellnessProvider, useWellness } from "@/components/wellness/wellness-provider";
 import { WellnessModal } from "@/components/wellness/wellness-modal";
 import { RoutineCheckinModal } from "@/components/wellness/routine-checkin-modal";
+import { AppOnlyModal } from "@/components/wellness/app-only-modal";
 import { Button } from "@/components/ui/button";
 import { ClipboardCheck } from "lucide-react";
 
@@ -28,6 +29,11 @@ const AssistantContent = () => {
     isRoutineCheckinModalOpen,
     openRoutineCheckinModal,
     closeRoutineCheckinModal,
+    isAppOnlyModalOpen,
+    appOnlyExerciseId,
+    appOnlyTitle,
+    appOnlyDescription,
+    closeAppOnlyModal,
   } = useWellness();
 
   const handleBreathingExercise = () => {
@@ -115,6 +121,13 @@ const AssistantContent = () => {
         open={isWellnessModalOpen}
         onOpenChange={closeWellnessModal}
         exerciseId={currentExerciseId}
+      />
+      <AppOnlyModal
+        open={isAppOnlyModalOpen}
+        onOpenChange={closeAppOnlyModal}
+        exerciseId={appOnlyExerciseId}
+        title={appOnlyTitle}
+        description={appOnlyDescription}
       />
     </>
   );

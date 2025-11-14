@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useWellness } from "./wellness-provider";
 
 export interface WelcomeExercise {
   id: string;
@@ -41,6 +42,16 @@ const getIconPath = (exerciseId: string): string | null => {
 };
 
 export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsProps) {
+  const { openAppOnlyModal } = useWellness();
+
+  const handleExerciseClick = (exercise: WelcomeExercise) => {
+    if (exercise.isAppOnly) {
+      openAppOnlyModal(exercise.id, exercise.title, exercise.description);
+    } else {
+      onExerciseClick(exercise.id);
+    }
+  };
+
   const exercises: WelcomeExercise[] = [
     {
       id: "breathing",
@@ -346,7 +357,7 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: index * 0.05 }}
-            onClick={() => onExerciseClick(exercise.id)}
+            onClick={() => handleExerciseClick(exercise)}
             className="group relative w-full flex flex-col rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300 overflow-hidden p-4 cursor-pointer"
           >
             {/* Badge in top right corner */}

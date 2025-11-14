@@ -12,6 +12,12 @@ interface WellnessContextType {
   isRoutineCheckinModalOpen: boolean;
   openRoutineCheckinModal: () => void;
   closeRoutineCheckinModal: () => void;
+  isAppOnlyModalOpen: boolean;
+  appOnlyExerciseId: string;
+  appOnlyTitle: string;
+  appOnlyDescription: string;
+  openAppOnlyModal: (exerciseId: string, title: string, description: string) => void;
+  closeAppOnlyModal: () => void;
 }
 
 const WellnessContext = createContext<WellnessContextType | undefined>(undefined);
@@ -21,6 +27,10 @@ export function WellnessProvider({ children }: { children: ReactNode }) {
   const [currentExerciseId, setCurrentExerciseId] = useState("breathing");
   const [shouldShowWellnessTrigger, setShouldShowWellnessTrigger] = useState(false);
   const [isRoutineCheckinModalOpen, setIsRoutineCheckinModalOpen] = useState(false);
+  const [isAppOnlyModalOpen, setIsAppOnlyModalOpen] = useState(false);
+  const [appOnlyExerciseId, setAppOnlyExerciseId] = useState("");
+  const [appOnlyTitle, setAppOnlyTitle] = useState("");
+  const [appOnlyDescription, setAppOnlyDescription] = useState("");
 
   const openWellnessModal = (exerciseId?: string) => {
     setCurrentExerciseId(exerciseId || "breathing");
@@ -30,6 +40,14 @@ export function WellnessProvider({ children }: { children: ReactNode }) {
 
   const openRoutineCheckinModal = () => setIsRoutineCheckinModalOpen(true);
   const closeRoutineCheckinModal = () => setIsRoutineCheckinModalOpen(false);
+
+  const openAppOnlyModal = (exerciseId: string, title: string, description: string) => {
+    setAppOnlyExerciseId(exerciseId);
+    setAppOnlyTitle(title);
+    setAppOnlyDescription(description);
+    setIsAppOnlyModalOpen(true);
+  };
+  const closeAppOnlyModal = () => setIsAppOnlyModalOpen(false);
 
   return (
     <WellnessContext.Provider
@@ -43,6 +61,12 @@ export function WellnessProvider({ children }: { children: ReactNode }) {
         isRoutineCheckinModalOpen,
         openRoutineCheckinModal,
         closeRoutineCheckinModal,
+        isAppOnlyModalOpen,
+        appOnlyExerciseId,
+        appOnlyTitle,
+        appOnlyDescription,
+        openAppOnlyModal,
+        closeAppOnlyModal,
       }}
     >
       {children}
