@@ -73,7 +73,7 @@ export function WatermelonTaichiExercise({ onComplete }: WatermelonTaichiExercis
                 Awesome!
               </h2>
               <p className="text-base text-center text-white max-w-xs">
-                Let's keep building our mind and body harmony!
+                Let&apos;s keep building our mind and body harmony!
               </p>
             </div>
 
