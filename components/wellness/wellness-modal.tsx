@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { BreathingExercise, type BreathingExerciseType } from "./breathing-exercise";
 import { Grounding54321Exercise } from "./grounding-54321-exercise";
+import { WatermelonTaichiExercise } from "./watermelon-taichi-exercise";
 import Image from "next/image";
 
 interface WellnessModalProps {
@@ -35,7 +36,7 @@ export function WellnessModal({
   const [selectedTechnique, setSelectedTechnique] = useState<BreathingExerciseType>("box");
   const [isExerciseStarted, setIsExerciseStarted] = useState(false);
   const [exerciseKey, setExerciseKey] = useState(0);
-  const [exerciseType, setExerciseType] = useState<"breathing" | "54321">("breathing");
+  const [exerciseType, setExerciseType] = useState<"breathing" | "54321" | "taichi">("breathing");
 
   // Reset state when modal opens/closes
   useEffect(() => {
@@ -46,6 +47,8 @@ export function WellnessModal({
       // Determine exercise type
       if (exerciseId === "grounding-54321") {
         setExerciseType("54321");
+      } else if (exerciseId === "yoga-stretch") {
+        setExerciseType("taichi");
       } else {
         setExerciseType("breathing");
         // Map exercise IDs to breathing exercise types
@@ -99,6 +102,22 @@ export function WellnessModal({
         <DialogContent className="max-w-md h-[85vh] max-h-[700px] p-0 overflow-hidden border-0 rounded-lg sm:rounded-lg" showCloseButton={false}>
           <div className="h-full overflow-hidden">
             <Grounding54321Exercise
+              key={exerciseKey}
+              onComplete={handleComplete}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // If it's taichi exercise, show it directly without selection screen
+  if (exerciseType === "taichi") {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-md h-[85vh] max-h-[700px] p-0 overflow-hidden border-0 rounded-lg sm:rounded-lg" showCloseButton={false}>
+          <div className="h-full overflow-hidden">
+            <WatermelonTaichiExercise
               key={exerciseKey}
               onComplete={handleComplete}
             />
