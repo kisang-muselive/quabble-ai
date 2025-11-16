@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { BreathingExercise, type BreathingExerciseType } from "./breathing-exercise";
+import { Grounding54321Exercise } from "./grounding-54321-exercise";
 import Image from "next/image";
 
 interface WellnessModalProps {
@@ -34,26 +35,34 @@ export function WellnessModal({
   const [selectedTechnique, setSelectedTechnique] = useState<BreathingExerciseType>("box");
   const [isExerciseStarted, setIsExerciseStarted] = useState(false);
   const [exerciseKey, setExerciseKey] = useState(0);
+  const [exerciseType, setExerciseType] = useState<"breathing" | "54321">("breathing");
 
   // Reset state when modal opens/closes
   useEffect(() => {
     if (open) {
       setIsExerciseStarted(false);
       setExerciseKey(0); // Reset exercise key for fresh start
-      // Map exercise IDs to breathing exercise types
-      const getBreathingExerciseType = (id: string): BreathingExerciseType => {
-        switch (id) {
-          case "box-breathing":
-            return "box";
-          case "breathing":
-            return "box";
-          case "555-breathing":
-            return "555";
-          default:
-            return "box";
-        }
-      };
-      setSelectedTechnique(getBreathingExerciseType(exerciseId));
+      
+      // Determine exercise type
+      if (exerciseId === "grounding-54321") {
+        setExerciseType("54321");
+      } else {
+        setExerciseType("breathing");
+        // Map exercise IDs to breathing exercise types
+        const getBreathingExerciseType = (id: string): BreathingExerciseType => {
+          switch (id) {
+            case "box-breathing":
+              return "box";
+            case "breathing":
+              return "box";
+            case "555-breathing":
+              return "555";
+            default:
+              return "box";
+          }
+        };
+        setSelectedTechnique(getBreathingExerciseType(exerciseId));
+      }
     } else {
       setIsExerciseStarted(false);
     }
@@ -82,6 +91,22 @@ export function WellnessModal({
   };
 
   const currentTechnique = BREATHING_TECHNIQUES.find(t => t.id === selectedTechnique);
+
+  // If it's 54321 exercise, show it directly without selection screen
+  if (exerciseType === "54321") {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-md h-[85vh] max-h-[700px] p-0 overflow-hidden border-0 rounded-lg sm:rounded-lg" showCloseButton={false}>
+          <div className="h-full overflow-hidden">
+            <Grounding54321Exercise
+              key={exerciseKey}
+              onComplete={handleComplete}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -23,4 +23,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+Watermelon Tai-chi video source: https://quabble-cdn.clubmuse.live/workouts/videos/watermelontaichi/taichi-duck-video-720.mp4
+
 # quabble-ai
