@@ -77,10 +77,20 @@ export function Grounding54321Exercise({
   const [completedCounts, setCompletedCounts] = useState<number[]>([0, 0, 0, 0, 0]);
   const [isCompleted, setIsCompleted] = useState(false);
   const [showInitialScreen, setShowInitialScreen] = useState(true);
+  const [isWriteMode, setIsWriteMode] = useState(false);
+  const [textInputs, setTextInputs] = useState<string[][]>([[], [], [], [], []]);
 
   const currentSense = SENSES[currentSenseIndex];
   // Progress for current sense only - each sense completes a full circle
-  const progress = currentSense.count > 0 ? completedCounts[currentSenseIndex] / currentSense.count : 0;
+  // In write mode, count filled text inputs; otherwise use button clicks
+  const getCurrentProgress = () => {
+    if (isWriteMode) {
+      const filledInputs = textInputs[currentSenseIndex].filter(text => text.trim().length > 0).length;
+      return currentSense.count > 0 ? filledInputs / currentSense.count : 0;
+    }
+    return currentSense.count > 0 ? completedCounts[currentSenseIndex] / currentSense.count : 0;
+  };
+  const progress = getCurrentProgress();
 
   useEffect(() => {
     // Check if all senses are completed
@@ -109,8 +119,27 @@ export function Grounding54321Exercise({
   const handleNext = useCallback(() => {
     if (currentSenseIndex < SENSES.length - 1) {
       setCurrentSenseIndex(currentSenseIndex + 1);
+      // Keep write mode active - don't reset it
     }
   }, [currentSenseIndex]);
+
+  const handleTextInputChange = (index: number, value: string) => {
+    const newInputs = [...textInputs];
+    if (!newInputs[currentSenseIndex]) {
+      newInputs[currentSenseIndex] = [];
+    }
+    newInputs[currentSenseIndex] = [...newInputs[currentSenseIndex]];
+    newInputs[currentSenseIndex][index] = value;
+    setTextInputs(newInputs);
+
+    // Update completed count based on filled inputs
+    const filledCount = newInputs[currentSenseIndex].filter(text => text.trim().length > 0).length;
+    setCompletedCounts(prev => {
+      const newCounts = [...prev];
+      newCounts[currentSenseIndex] = Math.min(filledCount, currentSense.count);
+      return newCounts;
+    });
+  };
 
   const handleRestart = () => {
     setCurrentSenseIndex(0);
@@ -139,6 +168,11 @@ export function Grounding54321Exercise({
     if (showInitialScreen || isCompleted) return;
 
     const handleKeyPress = (e: KeyboardEvent) => {
+      // Don't handle Enter if user is typing in an input field
+      if ((e.target as HTMLElement)?.tagName === "INPUT") {
+        return;
+      }
+      
       if (e.key === "Enter") {
         e.preventDefault();
         e.stopPropagation();
@@ -148,10 +182,12 @@ export function Grounding54321Exercise({
             handleNext();
           }
         } else {
-          // Otherwise, click the next number button
-          const nextNumber = completedCounts[currentSenseIndex] + 1;
-          if (nextNumber <= currentSense.count) {
-            handleNumberClick(nextNumber);
+          // Otherwise, click the next number button (only in button mode)
+          if (!isWriteMode) {
+            const nextNumber = completedCounts[currentSenseIndex] + 1;
+            if (nextNumber <= currentSense.count) {
+              handleNumberClick(nextNumber);
+            }
           }
         }
       }
@@ -159,7 +195,7 @@ export function Grounding54321Exercise({
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [showInitialScreen, isCompleted, currentSenseIndex, completedCounts, currentSense.count, handleNext, handleNumberClick]);
+  }, [showInitialScreen, isCompleted, currentSenseIndex, completedCounts, currentSense.count, handleNext, handleNumberClick, isWriteMode]);
 
   // Handle Enter key for completion screen
   useEffect(() => {
@@ -284,9 +320,9 @@ export function Grounding54321Exercise({
         <X className="w-6 h-6 text-gray-800" />
       </button>
 
-      <div className="flex flex-col items-center justify-center flex-1 px-6 py-8 pb-24 w-full">
+      <div className={`flex flex-col items-center ${isWriteMode ? "justify-start" : "justify-center"} flex-1 px-6 ${isWriteMode ? "pt-12 pb-24" : "py-8 pb-24"} w-full`}>
         {/* Circular Progress Bar */}
-        <div className="relative w-[350px] h-[350px] mb-8 flex items-center justify-center">
+        <div className={`relative mb-8 flex items-center justify-center ${isWriteMode ? "w-[200px] h-[200px]" : "w-[350px] h-[350px]"}`}>
           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
             {/* Background circle */}
             <circle
@@ -313,61 +349,85 @@ export function Grounding54321Exercise({
           </svg>
           
           {/* Center content */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-8 py-8">
-            <div className="mb-4">
+          <div className={`absolute inset-0 flex flex-col items-center justify-center ${isWriteMode ? "px-4 py-4" : "px-8 py-8"}`}>
+            <div className={isWriteMode ? "mb-2" : "mb-4"}>
               <Image
                 src={currentSense.icon}
                 alt={currentSense.type}
-                width={80}
-                height={80}
+                width={isWriteMode ? 50 : 80}
+                height={isWriteMode ? 50 : 80}
                 className="object-contain"
                 style={{ 
                   filter: "brightness(0) saturate(100%) invert(48%) sepia(6%) saturate(800%) hue-rotate(5deg) brightness(96%) contrast(92%)"
                 }}
               />
             </div>
-            <h3 className="text-2xl font-normal text-gray-900 mb-2 text-center px-6">
+            <h3 className={`font-normal text-gray-900 text-center ${isWriteMode ? "text-lg px-2" : "text-2xl mb-2 px-6"}`}>
               {currentSense.label}
             </h3>
-            <p className="text-base text-orange-600 text-center px-6">
-              {currentSense.instruction}
-            </p>
+            {!isWriteMode && (
+              <p className="text-base text-orange-600 text-center px-6">
+                {currentSense.instruction}
+              </p>
+            )}
           </div>
         </div>
 
-        {/* Example text */}
-        <p className="text-sm text-gray-500 mb-4">
-          ex) {currentSense.example}
-        </p>
+        {!isWriteMode ? (
+          <>
+            {/* Number buttons */}
+            <div className="flex gap-2 mb-6">
+              {Array.from({ length: currentSense.count }, (_, i) => i + 1).map((num) => {
+                const isCompleted = num <= completedCounts[currentSenseIndex];
+                return (
+                  <button
+                    key={num}
+                    onClick={() => handleNumberClick(num)}
+                    className={`w-12 h-16 rounded-full font-semibold transition-all ${
+                      isCompleted
+                        ? "text-white"
+                        : "text-gray-600 hover:bg-gray-200"
+                    }`}
+                    style={isCompleted ? { backgroundColor: "#E4914C" } : { backgroundColor: "#E5E4D7" }}
+                  >
+                    {num}
+                  </button>
+                );
+              })}
+            </div>
 
-        {/* Number buttons */}
-        <div className="flex gap-2 mb-6">
-          {Array.from({ length: currentSense.count }, (_, i) => i + 1).map((num) => {
-            const isCompleted = num <= completedCounts[currentSenseIndex];
-            return (
-              <button
-                key={num}
-                onClick={() => handleNumberClick(num)}
-                className={`w-12 h-16 rounded-full font-semibold transition-all ${
-                  isCompleted
-                    ? "text-white"
-                    : "text-gray-600 hover:bg-gray-200"
-                }`}
-                style={isCompleted ? { backgroundColor: "#E4914C" } : { backgroundColor: "#E5E4D7" }}
-              >
-                {num}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Instruction text */}
-        <p className="text-sm text-gray-500 mb-2 text-center">
-          Tap the button for each object<span className="hidden md:inline"> <span className="text-orange-600 font-semibold">(or Press Enter)</span></span>
-        </p>
-        <p className={`text-sm text-orange-600 underline mb-4 text-center ${currentSenseIndex === 0 ? "" : "invisible"}`}>
-          or write what I see
-        </p>
+            {/* Instruction text */}
+            <p className="text-sm text-gray-500 mb-2 text-center">
+              Tap the button for each object<span className="hidden md:inline"> <span className="text-orange-600 font-semibold">(or Press Enter)</span></span>
+            </p>
+            <p 
+              className={`text-sm text-orange-600 underline mb-4 text-center cursor-pointer ${currentSenseIndex === 0 ? "" : "invisible"}`}
+              onClick={() => setIsWriteMode(true)}
+            >
+              or write your answers
+            </p>
+          </>
+        ) : (
+          <>
+            {/* Text input fields */}
+            <div className="w-full max-w-md space-y-3 mb-6">
+              {Array.from({ length: currentSense.count }, (_, i) => i).map((index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[#E5E4D7] text-gray-600 font-semibold flex-shrink-0">
+                    {index + 1}
+                  </div>
+                  <input
+                    type="text"
+                    value={textInputs[currentSenseIndex]?.[index] || ""}
+                    onChange={(e) => handleTextInputChange(index, e.target.value)}
+                    placeholder={index === 0 ? `ex) ${currentSense.example}` : ""}
+                    className="flex-1 px-4 py-3 rounded-lg border border-gray-300 bg-[#FAF9F3] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                  />
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Next button - Fixed at bottom */}
