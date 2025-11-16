@@ -383,7 +383,7 @@ export function Grounding54321Exercise({
                   <button
                     key={num}
                     onClick={() => handleNumberClick(num)}
-                    className={`w-12 h-16 rounded-full font-semibold transition-all ${
+                    className={`w-12 h-16 rounded-full font-semibold transition-all cursor-pointer ${
                       isCompleted
                         ? "text-white"
                         : "text-gray-600 hover:bg-gray-200"
