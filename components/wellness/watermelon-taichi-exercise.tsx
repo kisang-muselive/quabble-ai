@@ -47,7 +47,7 @@ export function WatermelonTaichiExercise({ onComplete }: WatermelonTaichiExercis
         {/* Video */}
         <video
           ref={videoRef}
-          className="w-full h-full object-contain"
+          className="w-full h-full object-cover"
           onEnded={handleVideoEnd}
           playsInline
         >
