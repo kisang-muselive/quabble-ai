@@ -320,9 +320,9 @@ export function Grounding54321Exercise({
         <X className="w-6 h-6 text-gray-800" />
       </button>
 
-      <div className={`flex flex-col items-center ${isWriteMode ? "justify-start" : "justify-center"} flex-1 px-6 ${isWriteMode ? "pt-12 pb-24" : "py-8 pb-24"} w-full`}>
+      <div className={`flex flex-col items-center ${isWriteMode ? "justify-start" : "justify-center"} flex-1 px-6 ${isWriteMode ? "pt-12 pb-24" : "pt-12 pb-24"} w-full`}>
         {/* Circular Progress Bar */}
-        <div className={`relative mb-8 flex items-center justify-center ${isWriteMode ? "w-[200px] h-[200px]" : "w-[350px] h-[350px]"}`}>
+        <div className={`relative mb-6 flex items-center justify-center ${isWriteMode ? "w-[200px] h-[200px]" : "w-[350px] h-[350px]"}`}>
           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
             {/* Background circle */}
             <circle
@@ -375,6 +375,11 @@ export function Grounding54321Exercise({
 
         {!isWriteMode ? (
           <>
+            {/* Example text */}
+            <p className="text-sm text-gray-500 mb-4 text-center">
+              ex) {currentSense.example}
+            </p>
+            
             {/* Number buttons */}
             <div className="flex gap-2 mb-6">
               {Array.from({ length: currentSense.count }, (_, i) => i + 1).map((num) => {
