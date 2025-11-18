@@ -19,6 +19,8 @@ import { RoutineCheckinModal } from "@/components/wellness/routine-checkin-modal
 import { AppOnlyModal } from "@/components/wellness/app-only-modal";
 import { Button } from "@/components/ui/button";
 import { ClipboardCheck } from "lucide-react";
+import { useState } from "react";
+import { LoginDropdown } from "@/components/auth/login-dropdown";
 
 const AssistantContent = () => {
   const {
@@ -35,6 +37,8 @@ const AssistantContent = () => {
     appOnlyDescription,
     closeAppOnlyModal,
   } = useWellness();
+
+  const [showLoginDropdown, setShowLoginDropdown] = useState(false);
 
   const handleBreathingExercise = () => {
     openWellnessModal("breathing");
@@ -66,32 +70,20 @@ const AssistantContent = () => {
                 <span className="text-2xl font-semibold">Quabble</span>
               </div>
 
-              {/* Right side - iOS and Android download badges */}
-              <div className="ml-auto flex items-center gap-3">
-                <a
-                  href="https://apps.apple.com/us/app/quabble-daily-mental-health/id6445948886"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block hover:opacity-80 transition-opacity h-8"
+              {/* Right side - Login button */}
+              <div className="ml-auto flex items-center gap-3 relative">
+                <Button
+                  onClick={() => setShowLoginDropdown(!showLoginDropdown)}
+                  variant="outline"
+                  size="sm"
+                  className="font-semibold"
                 >
-                  <img
-                    src="/appstore.png"
-                    alt="Download on the App Store"
-                    className="h-8 w-auto object-contain"
-                  />
-                </a>
-                <a
-                  href="https://play.google.com/store/apps/details?id=com.museLIVE.quabbleapp&hl=en_US"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block hover:opacity-80 transition-opacity h-8"
-                >
-                  <img
-                    src="/google.png"
-                    alt="Get it on Google Play"
-                    className="h-8 w-auto object-contain"
-                  />
-                </a>
+                  Log in
+                </Button>
+
+                {showLoginDropdown && (
+                  <LoginDropdown onClose={() => setShowLoginDropdown(false)} />
+                )}
               </div>
 
               {/* Original Routine Check-in button - commented out */}

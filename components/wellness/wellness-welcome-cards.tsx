@@ -181,6 +181,34 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
               Quabble&apos;s Mind Workout is a daily mental health exercise you can complete in just a few minutes. It fills the gaps between therapy sessions and is designed, based on scientific evidence, to ease stress, anxiety, and low mood. Simply put, it&apos;s a short daily workout for your mind.
             </p>
+
+            {/* App Download Buttons */}
+            <div className="flex items-center gap-3 pt-2">
+              <a
+                href="https://apps.apple.com/us/app/quabble-daily-mental-health/id6445948886"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block hover:opacity-80 transition-opacity"
+              >
+                <img
+                  src="/appstore.png"
+                  alt="Download on the App Store"
+                  className="h-10 w-auto object-contain"
+                />
+              </a>
+              <a
+                href="https://play.google.com/store/apps/details?id=com.museLIVE.quabbleapp&hl=en_US"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block hover:opacity-80 transition-opacity"
+              >
+                <img
+                  src="/google.png"
+                  alt="Get it on Google Play"
+                  className="h-10 w-auto object-contain"
+                />
+              </a>
+            </div>
           </div>
 
           {/* Right side - Hero image */}
