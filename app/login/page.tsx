@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
-import Image from "next/image";
+import api, { ApiError, CustomApiErrorType, setAccessToken } from "@/lib/api";
+import { API_ROUTE, STORAGE_KEY } from "@/lib/constants";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -30,24 +31,70 @@ export default function LoginPage() {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrorMessage("Please enter a valid email.");
+      return;
+    }
+
     setIsLoading(true);
     setErrorMessage("");
 
     try {
-      // TODO: Implement actual authentication API call
-      // For now, this is a placeholder
-      console.log("Login attempt with:", { email, password });
+      // Try password signin endpoint
+      const { data } = await api.post(API_ROUTE.PW_SIGNIN, {
+        email: email,
+        password: password,
+      });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log("Login success:", data);
 
-      // On success, redirect to main page
+      // Store auth info
+      if (data?.accessToken) {
+        setAccessToken(data.accessToken);
+      }
+
+      if (data?.refreshToken && typeof window !== "undefined") {
+        window.localStorage.setItem(STORAGE_KEY.REFRESH_TOKEN, data.refreshToken);
+      }
+
+      if (data?.email && typeof window !== "undefined") {
+        window.localStorage.setItem(STORAGE_KEY.EMAIL, data.email);
+      }
+
+      // Redirect to main page on success
       router.push("/");
-    } catch (error) {
-      setErrorMessage("Invalid email or password");
+    } catch (err) {
+      const { response } = err as ApiError<CustomApiErrorType>;
+      console.error("Login failed:", response);
+
+      switch (response?.status) {
+        case 400:
+          setErrorMessage("Invalid email or password");
+          break;
+        case 401:
+          setErrorMessage("Invalid email or password");
+          break;
+        case 404:
+          setErrorMessage("Email not found. Please sign up first.");
+          break;
+        case 403:
+          setErrorMessage("You haven't been verified yet. Please check your email.");
+          break;
+        case 500:
+          setErrorMessage("System error. Please try again.");
+          break;
+        default:
+          setErrorMessage("Failed to login. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleForgotPassword = () => {
+    // TODO: Implement forgot password flow
+    alert("Forgot password feature coming soon. Please contact quabble@muse.live for assistance.");
   };
 
   return (
@@ -83,7 +130,10 @@ export default function LoginPage() {
                 type="email"
                 placeholder="Enter your email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setErrorMessage("");
+                }}
                 onKeyUp={handleKeyUp}
                 autoFocus
                 className="h-12"
@@ -91,22 +141,35 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
-                Password
-              </label>
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="text-sm font-medium">
+                  Password
+                </label>
+                <button
+                  onClick={handleForgotPassword}
+                  className="text-xs text-primary hover:underline"
+                >
+                  Forgot password?
+                </button>
+              </div>
               <Input
                 id="password"
                 type="password"
                 placeholder="Enter your password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setErrorMessage("");
+                }}
                 onKeyUp={handleKeyUp}
                 className="h-12"
               />
             </div>
 
             {errorMessage && (
-              <div className="text-sm text-destructive text-center">{errorMessage}</div>
+              <div className="text-sm text-destructive text-center bg-destructive/10 p-3 rounded-md">
+                {errorMessage}
+              </div>
             )}
 
             <Button
