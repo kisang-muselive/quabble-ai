@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
@@ -12,7 +12,7 @@ const ANDROID_PLAY_URL = "https://play.google.com/store/apps/details?id=com.muse
 const IOS_APP_STORE_URL = "https://apps.apple.com/app/id6445948886";
 const IOS_APP_SCHEME = "quabbleapp://";
 
-export default function CongratsPage() {
+function CongratsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
@@ -252,5 +252,22 @@ export default function CongratsPage() {
         <p>&copy; 2024 Quabble. All rights reserved.</p>
       </footer>
     </div>
+  );
+}
+
+export default function CongratsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
+          <div className="text-center space-y-6">
+            <Loader2 className="h-16 w-16 text-primary animate-spin mx-auto" />
+            <h2 className="text-2xl font-bold">Loading...</h2>
+          </div>
+        </div>
+      }
+    >
+      <CongratsContent />
+    </Suspense>
   );
 }
