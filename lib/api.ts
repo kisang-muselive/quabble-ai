@@ -9,6 +9,11 @@ export type ApiError<T = unknown> = AxiosError<T>;
 
 let accessToken = "";
 
+// Log the API URL being used (only in development or if explicitly enabled)
+if (typeof window !== "undefined" && (process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_DEBUG_API_URL === "true")) {
+  console.log("🔸 API Base URL:", process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000");
+}
+
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
 });
