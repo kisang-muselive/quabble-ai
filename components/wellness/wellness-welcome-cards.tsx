@@ -72,6 +72,12 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
       hasPlayButton: true,
     },
     {
+      id: "meditation",
+      title: "Meditation",
+      description: "Three-minute guided meditation to relax and focus",
+      hasPlayButton: true,
+    },
+    {
       id: "bamboo-forest",
       title: "Bamboo Forest",
       description: "Safe place for anonymous sharing and connecting with others",
@@ -94,12 +100,6 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
       title: "Gratitude Jar",
       description: "Daily gratitude diary to appreciate little things in life",
       isAppOnly: true,
-    },
-    {
-      id: "meditation",
-      title: "Meditation",
-      description: "Three-minute guided meditation to relax and focus",
-      hasPlayButton: true,
     },
     {
       id: "proud-dandelion",
