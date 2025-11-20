@@ -123,7 +123,7 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
       id: "thank-you",
       title: "Thank You",
       description: "Send a thank you note to someone special and spread joy",
-      isAppOnly: true,
+      hasPlayButton: true,
     },
     {
       id: "visualization",
@@ -404,6 +404,49 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
               {/* Description */}
               <p className="text-sm text-muted-foreground leading-snug text-left">
                 Three-minute guided meditation to relax and focus
+              </p>
+            </motion.button>
+
+            {/* Thank You Card */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5 }}
+              onClick={() => onExerciseClick("thank-you")}
+              className="group relative w-full flex flex-col rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300 overflow-hidden p-4 cursor-pointer"
+            >
+              {/* Badge in top right corner */}
+              <div className="absolute top-3 right-3 z-10">
+                <div className="w-8 h-8 flex items-center justify-center">
+                  <Image
+                    src="/icons/play.png"
+                    alt="Play"
+                    width={32}
+                    height={32}
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+
+              {/* Icon at top left */}
+              <div className="flex items-start justify-start mb-3 h-12">
+                <Image
+                  src="/icons/workout-icon_thank-you.png"
+                  alt="Thank You"
+                  width={48}
+                  height={48}
+                  className="object-contain"
+                />
+              </div>
+
+              {/* Title */}
+              <h4 className="font-semibold text-base text-foreground group-hover:text-primary transition-colors mb-2 text-left">
+                Thank You
+              </h4>
+
+              {/* Description */}
+              <p className="text-sm text-muted-foreground leading-snug text-left">
+                Send a thank you note to someone special and spread joy
               </p>
             </motion.button>
           </div>

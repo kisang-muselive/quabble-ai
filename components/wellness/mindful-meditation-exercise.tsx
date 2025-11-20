@@ -52,6 +52,7 @@ export function MindfulMeditationExercise({
   const [isCompleted, setIsCompleted] = useState(false);
   const [selectedSound, setSelectedSound] = useState<SoundType | null>(null);
   const startTimeRef = useRef<number>(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Lottie animation refs
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -60,6 +61,14 @@ export function MindfulMeditationExercise({
   const fireLottieRef = useRef<any>(null);
   const [sparkleAnimationData, setSparkleAnimationData] = useState<object | null>(null);
   const [fireAnimationData, setFireAnimationData] = useState<object | null>(null);
+
+  // Audio file mapping
+  const audioFileMap: Record<SoundType, string> = {
+    music: "/workouts/meditation/music.mp3",
+    rain: "/workouts/meditation/rain.mp3",
+    voice: "/workouts/meditation/voice.mp3",
+    wave: "/workouts/meditation/wave.mp3",
+  };
 
   // Load Lottie animation data
   useEffect(() => {
@@ -82,6 +91,11 @@ export function MindfulMeditationExercise({
       // Meditation complete
       setMeditationStarted(false);
       setIsCompleted(true);
+      // Stop audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
       return;
     }
 
@@ -100,6 +114,16 @@ export function MindfulMeditationExercise({
     setShowInitialScreen(false);
     setMeditationStarted(true);
     startTimeRef.current = performance.now();
+
+    // Play selected audio if available
+    if (selectedSound && audioFileMap[selectedSound]) {
+      audioRef.current = new Audio(audioFileMap[selectedSound]);
+      audioRef.current.loop = true;
+      audioRef.current.volume = 0.5; // Set volume to 50%
+      audioRef.current.play().catch((err) => {
+        console.error("Failed to play audio:", err);
+      });
+    }
   };
 
   const handleRestart = () => {
@@ -109,7 +133,32 @@ export function MindfulMeditationExercise({
     setShowInitialScreen(true);
     setSelectedSound(null);
     startTimeRef.current = 0;
+    // Stop audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
   };
+
+  // Handle close with audio cleanup
+  const handleClose = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
+    onComplete?.();
+  };
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -134,7 +183,7 @@ export function MindfulMeditationExercise({
 
         {/* Close button */}
         <button
-          onClick={() => onComplete?.()}
+          onClick={handleClose}
           className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors cursor-pointer"
           aria-label="Close exercise"
         >
@@ -230,7 +279,7 @@ export function MindfulMeditationExercise({
 
         {/* Close button */}
         <button
-          onClick={() => onComplete?.()}
+          onClick={handleClose}
           className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors cursor-pointer"
           aria-label="Close exercise"
         >
@@ -317,7 +366,7 @@ export function MindfulMeditationExercise({
 
       {/* Close button */}
       <button
-        onClick={onComplete}
+        onClick={handleClose}
         className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors cursor-pointer"
         aria-label="Close exercise"
       >
