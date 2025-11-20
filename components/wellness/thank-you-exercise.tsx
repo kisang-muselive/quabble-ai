@@ -14,7 +14,7 @@ type ScreenType = "onboarding" | "main" | "toFrom" | "message" | "cardSelection"
 export function ThankYouExercise({
   onComplete
 }: ThankYouExerciseProps) {
-  const [currentScreen, setCurrentScreen] = useState<ScreenType>("onboarding");
+  const [currentScreen, setCurrentScreen] = useState<ScreenType>("main");
   const [toName, setToName] = useState("");
   const [fromName, setFromName] = useState("");
   const [message, setMessage] = useState("");
@@ -117,45 +117,50 @@ export function ThankYouExercise({
           <X className="w-6 h-6 text-gray-800" />
         </button>
 
-        <div className="flex flex-col items-center justify-center flex-1 px-6 py-8 pb-24">
-          {/* Title */}
+        {/* Title and Description - positioned to match meditation workout */}
+        <div className="absolute top-[10%] left-0 right-0 z-10 flex flex-col items-center px-6">
           <h2 className="text-4xl font-normal mb-4 text-gray-900 text-center">
             Thank You
           </h2>
-
-          {/* Description */}
-          <p className="text-base mb-8 text-center text-gray-700 max-w-xs">
+          <p className="text-base mb-8 text-center text-gray-700 max-w-md leading-relaxed">
             Write a thank you note to someone special to you.
             <br />
             Let&apos;s bring out our unspoken appreciations,
             <br />
             and spread joy and gratitude!
           </p>
+        </div>
+
+        <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-6 py-8 pb-24">
 
           {/* Bird with letter illustration */}
-          <div className="relative w-[280px] h-[280px] mb-8 flex items-center justify-center">
+          <div className="relative w-[240px] h-[240px] mb-8 flex items-center justify-center mt-24">
             <Image
               src="/workouts/thankyou/thankyou_bird_letter.svg"
               alt="Thank You Bird"
-              width={280}
-              height={280}
+              width={240}
+              height={240}
               className="object-contain"
             />
           </div>
 
+        </div>
+
+        {/* Letters illustration and Note count - Fixed above button */}
+        <div className="absolute bottom-24 left-0 right-0 z-10 flex flex-col items-center gap-6">
           {/* Letters illustration */}
-          <div className="relative w-[200px] h-[100px] mb-6 flex items-center justify-center">
+          <div className="relative w-[60px] h-[30px] flex items-center justify-center">
             <Image
               src="/workouts/thankyou/letters.svg"
               alt="Letters"
-              width={200}
-              height={100}
+              width={60}
+              height={30}
               className="object-contain"
             />
           </div>
 
           {/* Note count */}
-          <div className="flex items-center gap-2 mb-8">
+          <div className="flex items-center gap-2">
             <Image
               src="/workouts/thankyou/list_icon.svg"
               alt="List"
