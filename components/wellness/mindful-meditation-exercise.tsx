@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, Headphones, Volume2 } from "lucide-react";
 import Lottie from "lottie-react";
 import Image from "next/image";
 
@@ -50,7 +50,7 @@ export function MindfulMeditationExercise({
   const [meditationStarted, setMeditationStarted] = useState(false);
   const [currentSecond, setCurrentSecond] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [selectedSound, setSelectedSound] = useState<SoundType | null>(null);
+  const [selectedSound, setSelectedSound] = useState<SoundType>("music");
   const startTimeRef = useRef<number>(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -107,7 +107,7 @@ export function MindfulMeditationExercise({
   }, [meditationStarted, currentSecond]);
 
   const handleSoundToggle = (soundId: SoundType) => {
-    setSelectedSound((prev) => (prev === soundId ? null : soundId));
+    setSelectedSound(soundId);
   };
 
   const handleBegin = () => {
@@ -131,7 +131,7 @@ export function MindfulMeditationExercise({
     setCurrentSecond(0);
     setMeditationStarted(false);
     setShowInitialScreen(true);
-    setSelectedSound(null);
+    setSelectedSound("music");
     startTimeRef.current = 0;
     // Stop audio
     if (audioRef.current) {
@@ -190,19 +190,19 @@ export function MindfulMeditationExercise({
           <X className="w-6 h-6 text-white" />
         </button>
 
-        <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-6 py-8 pb-24">
-          {/* Title */}
+        {/* Title and Description - positioned to match completion screen */}
+        <div className="absolute top-[10%] left-0 right-0 z-10 flex flex-col items-center px-6">
           <h2 className="text-3xl font-normal mb-4 text-white text-center">
             Mindful Meditation
           </h2>
-          
-          {/* Description */}
           <p className="text-base mb-8 text-center text-white/90 max-w-xs">
             Welcome to the 3 minute breathing space. Let&apos;s create a space of calmness and serenity.
           </p>
+        </div>
 
+        <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-6 py-8 pb-24">
           {/* Glowing object preview */}
-          <div className="relative w-[200px] h-[200px] mb-8 flex items-center justify-center">
+          <div className="relative w-[200px] h-[200px] mb-3 flex items-center justify-center">
             {sparkleAnimationData && (
               <Lottie
                 lottieRef={sparkleLottieRef}
@@ -214,8 +214,19 @@ export function MindfulMeditationExercise({
             )}
           </div>
 
+          {/* Audio instruction message */}
+          <div className="flex flex-col items-center justify-center gap-2 mb-3">
+            <div className="flex items-center justify-center gap-3">
+              <Headphones className="w-5 h-5 text-white" />
+              <Volume2 className="w-5 h-5 text-white" />
+            </div>
+            <p className="text-base md:text-lg text-center text-white/90 max-w-xs px-4 font-medium">
+              Put on your headphones and turn the volume up
+            </p>
+          </div>
+
           {/* Sound selection icons */}
-          <div className="flex gap-4 mb-8">
+          <div className="flex gap-4 mb-4">
             {SOUNDS.map((sound) => {
               const isSelected = selectedSound === sound.id;
               return (
