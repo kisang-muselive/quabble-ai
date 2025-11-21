@@ -78,6 +78,12 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
       hasPlayButton: true,
     },
     {
+      id: "thank-you",
+      title: "Thank You",
+      description: "Send a thank you note to someone special and spread joy",
+      hasPlayButton: true,
+    },
+    {
       id: "bamboo-forest",
       title: "Bamboo Forest",
       description: "Safe place for anonymous sharing and connecting with others",
@@ -118,12 +124,6 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
       title: "Moonlight",
       description: "Build your nightly routine and enjoy better sleep",
       isAppOnly: true,
-    },
-    {
-      id: "thank-you",
-      title: "Thank You",
-      description: "Send a thank you note to someone special and spread joy",
-      hasPlayButton: true,
     },
     {
       id: "visualization",
