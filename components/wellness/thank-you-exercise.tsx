@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 import { Button } from "@/components/ui/button";
 import { X, ChevronLeft } from "lucide-react";
 import Image from "next/image";
@@ -16,17 +17,38 @@ export function ThankYouExercise({
 }: ThankYouExerciseProps) {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>("main");
   const [toName, setToName] = useState("");
+  const [toEmail, setToEmail] = useState("");
   const [fromName, setFromName] = useState("");
   const [message, setMessage] = useState("");
   const [selectedCardIndex, setSelectedCardIndex] = useState(0);
   const [noteCount, setNoteCount] = useState(1); // Track number of notes written
+  
+  // Embla carousel
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
+  
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedCardIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+  
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+  }, [emblaApi, onSelect]);
+  
+  const scrollTo = useCallback(
+    (index: number) => emblaApi && emblaApi.scrollTo(index),
+    [emblaApi]
+  );
 
   const handleStartWriting = () => {
     setCurrentScreen("toFrom");
   };
 
   const handleToFromNext = () => {
-    if (toName.trim() && fromName.trim()) {
+    if (toName.trim() && toEmail.trim() && fromName.trim()) {
       setCurrentScreen("message");
     }
   };
@@ -47,10 +69,10 @@ export function ThankYouExercise({
     console.log("Share card");
   };
 
-  const handleDelete = () => {
-    // TODO: Implement delete functionality
+  const handleWriteNewLetter = () => {
     setCurrentScreen("main");
     setToName("");
+    setToEmail("");
     setFromName("");
     setMessage("");
     setSelectedCardIndex(0);
@@ -191,15 +213,7 @@ export function ThankYouExercise({
   // To/From Input Screen
   if (currentScreen === "toFrom") {
     return (
-      <div
-        className="flex flex-col items-center justify-center h-full w-full relative"
-        style={{
-          backgroundImage: "url(/workouts/thankyou/thankyou_watermark.png)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="absolute inset-0 bg-[#FAF9F3]/90" />
+      <div className="flex flex-col items-center justify-center h-full w-full relative bg-[#FAF9F3]">
 
         <button
           onClick={handleBack}
@@ -218,14 +232,14 @@ export function ThankYouExercise({
         </button>
 
         <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-6 py-8 w-full max-w-md">
-          <h2 className="text-2xl font-normal mb-8 text-gray-900 text-center">
+          <h2 className="text-lg font-normal mb-8 text-gray-900 text-left w-full">
             Who do you want to express your appreciation to?
           </h2>
 
           {/* To input */}
           <div className="w-full mb-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0">
+              <div className="w-24 h-12 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-semibold">to</span>
               </div>
               <input
@@ -236,12 +250,21 @@ export function ThankYouExercise({
                 className="flex-1 px-4 py-3 text-lg border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-gray-600 text-gray-900 placeholder:text-gray-400"
               />
             </div>
+            <div className="flex items-center gap-3 ml-28">
+              <input
+                type="email"
+                value={toEmail}
+                onChange={(e) => setToEmail(e.target.value)}
+                placeholder="Email address"
+                className="flex-1 px-4 py-3 text-lg border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-gray-600 text-gray-900 placeholder:text-gray-400"
+              />
+            </div>
           </div>
 
           {/* From input */}
           <div className="w-full mb-8">
             <div className="flex items-center gap-3">
-              <div className="w-24 h-12 rounded-lg bg-gray-400 flex items-center justify-center flex-shrink-0">
+              <div className="w-24 h-12 rounded-full bg-gray-400 flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-semibold">from</span>
               </div>
               <input
@@ -255,7 +278,7 @@ export function ThankYouExercise({
           </div>
 
           {/* Hummingbird illustration */}
-          <div className="relative w-[120px] h-[120px] flex items-center justify-center">
+          <div className="relative w-[120px] h-[120px] flex items-center justify-center opacity-50">
             <Image
               src="/workouts/thankyou/thankyou_bird.svg"
               alt="Hummingbird"
@@ -270,10 +293,10 @@ export function ThankYouExercise({
         <div className="absolute bottom-0 left-0 right-0 px-6 pb-6 z-10 flex justify-center">
           <Button
             onClick={handleToFromNext}
-            disabled={!toName.trim() || !fromName.trim()}
+            disabled={!toName.trim() || !toEmail.trim() || !fromName.trim()}
             size="lg"
             className={`w-full max-w-[320px] rounded-full text-lg font-semibold py-6 shadow-lg ${
-              toName.trim() && fromName.trim()
+              toName.trim() && toEmail.trim() && fromName.trim()
                 ? "bg-gray-700 hover:bg-gray-800 text-white cursor-pointer"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
@@ -324,8 +347,8 @@ export function ThankYouExercise({
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Hard to think of any?"
-              className="w-full h-[300px] px-4 py-3 text-base border-2 border-gray-300 rounded-lg bg-white focus:outline-none focus:border-gray-600 text-gray-900 placeholder:text-gray-400 resize-none"
+              placeholder="Thank you for making every moment we share special. Your friendship is a true gift"
+              className="w-full h-[250px] px-4 py-3 text-base border-2 border-gray-300 rounded-lg bg-white focus:outline-none focus:border-gray-600 text-gray-900 placeholder:text-gray-400 resize-none"
               maxLength={250}
             />
             <div className="absolute bottom-2 right-2 text-sm text-gray-400">
@@ -334,7 +357,7 @@ export function ThankYouExercise({
           </div>
 
           {/* Hummingbird illustration */}
-          <div className="relative w-[100px] h-[100px] flex items-center justify-center self-end">
+          <div className="relative w-[100px] h-[100px] flex items-center justify-center self-center opacity-50">
             <Image
               src="/workouts/thankyou/thankyou_bird.svg"
               alt="Hummingbird"
@@ -389,32 +412,43 @@ export function ThankYouExercise({
             Choose the style of the card
           </h2>
 
-          {/* Card preview */}
-          <div className="relative w-full max-w-sm mb-6">
-            <div className="relative aspect-[4/3] bg-white rounded-lg shadow-lg overflow-hidden">
-              <Image
-                src={`/workouts/thankyou/thankyou_card${selectedCardIndex + 1}@3x.png`}
-                alt={`Card ${selectedCardIndex + 1}`}
-                fill
-                className="object-contain"
-              />
-              {/* Overlay text */}
-              <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/80">
-                <div className="flex justify-between items-end text-sm">
-                  <span className="text-gray-700">to. {toName}</span>
-                  <span className="text-gray-700">{message || "Hello"}</span>
-                  <span className="text-gray-700">from. {fromName}</span>
+          {/* Card carousel */}
+          <div className="embla relative w-full max-w-sm mb-2" ref={emblaRef}>
+            <div className="embla__container">
+              {[0, 1, 2].map((index) => (
+                <div key={index} className="embla__slide">
+                  <div className="relative bg-white rounded-lg shadow-lg overflow-hidden mx-2 mb-4">
+                    <Image
+                      src={`/workouts/thankyou/thankyou_card${index + 1}@3x.png`}
+                      alt={`Card ${index + 1}`}
+                      width={400}
+                      height={300}
+                      className="object-contain w-full"
+                    />
+                    {/* Text below image */}
+                    <div className="p-6 py-10 bg-white min-h-[180px]">
+                      <div className="flex flex-col gap-4 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">to. {toName}</span>
+                          <span className="text-gray-700">from. {fromName}</span>
+                        </div>
+                        <div className="text-center">
+                          <span className="text-gray-700">{message || "Hello"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
 
           {/* Card selection dots */}
-          <div className="flex gap-2 mb-8">
+          <div className="flex gap-2 mb-4">
             {[0, 1, 2].map((index) => (
               <button
                 key={index}
-                onClick={() => setSelectedCardIndex(index)}
+                onClick={() => scrollTo(index)}
                 className={`w-2 h-2 rounded-full transition-all ${
                   selectedCardIndex === index ? "bg-gray-800" : "bg-gray-300"
                 }`}
@@ -452,56 +486,39 @@ export function ThankYouExercise({
 
         <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-6 py-8 pb-24">
           {/* Card display */}
-          <div className="relative w-full max-w-sm mb-8">
-            <div className="relative aspect-[4/3] bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className="relative w-full max-w-sm mb-8 pb-4 mt-16">
+            <div className="relative bg-white rounded-lg shadow-lg overflow-hidden">
               <Image
                 src={`/workouts/thankyou/thankyou_card${selectedCardIndex + 1}@3x.png`}
                 alt={`Card ${selectedCardIndex + 1}`}
-                fill
-                className="object-contain"
+                width={400}
+                height={300}
+                className="object-contain w-full"
               />
-              {/* Overlay text */}
-              <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/80">
-                <div className="flex justify-between items-end text-sm">
-                  <span className="text-gray-700">to. {toName}</span>
-                  <span className="text-gray-700">{message || "Hello"}</span>
-                  <span className="text-gray-700">from. {fromName}</span>
+              {/* Text below image */}
+              <div className="p-6 py-10 bg-white min-h-[180px]">
+                <div className="flex flex-col gap-4 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-700">to. {toName}</span>
+                    <span className="text-gray-700">from. {fromName}</span>
+                  </div>
+                  <div className="text-center">
+                    <span className="text-gray-700">{message || "Hello"}</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Action buttons */}
-          <div className="flex gap-4">
-            <button
-              onClick={handleShare}
-              className="flex flex-col items-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-              aria-label="Share"
+          {/* Action button */}
+          <div className="flex justify-center">
+            <Button
+              onClick={handleWriteNewLetter}
+              size="lg"
+              className="w-full max-w-[320px] rounded-full text-lg font-semibold py-6 bg-gray-700 hover:bg-gray-800 text-white shadow-lg cursor-pointer"
             >
-              <Image
-                src="/workouts/thankyou/share_icon_2.svg"
-                alt="Share"
-                width={32}
-                height={32}
-                className="object-contain"
-              />
-              <span className="text-sm text-gray-700">Share</span>
-            </button>
-
-            <button
-              onClick={handleDelete}
-              className="flex flex-col items-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-              aria-label="Delete"
-            >
-              <Image
-                src="/workouts/thankyou/trashcan_icon_warmgray015.svg"
-                alt="Delete"
-                width={32}
-                height={32}
-                className="object-contain"
-              />
-              <span className="text-sm text-gray-700">Delete</span>
-            </button>
+              Write a new letter
+            </Button>
           </div>
         </div>
       </div>
