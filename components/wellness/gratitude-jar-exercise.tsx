@@ -462,7 +462,7 @@ export function GratitudeJarExercise({
               value={gratitudeText}
               onChange={(e) => setGratitudeText(e.target.value)}
               placeholder=""
-              className="w-full h-[300px] px-4 py-3 text-base border-2 border-gray-300 rounded-lg bg-white focus:outline-none focus:border-gray-600 text-gray-900 placeholder:text-gray-400 resize-none"
+              className="w-full h-[150px] px-4 py-3 text-base border-2 border-gray-300 rounded-lg bg-white focus:outline-none focus:border-gray-600 text-gray-900 placeholder:text-gray-400 resize-none"
               autoFocus
             />
           </div>
