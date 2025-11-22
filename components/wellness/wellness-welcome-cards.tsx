@@ -84,6 +84,12 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
       hasPlayButton: true,
     },
     {
+      id: "gratitude",
+      title: "Gratitude Jar",
+      description: "Daily gratitude diary to appreciate little things in life",
+      hasPlayButton: true,
+    },
+    {
       id: "bamboo-forest",
       title: "Bamboo Forest",
       description: "Safe place for anonymous sharing and connecting with others",
@@ -100,12 +106,6 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
       title: "Mood Diary",
       description: "Simple, effective mood tracking to recognize patterns and triggers",
       isAppOnly: true,
-    },
-    {
-      id: "gratitude",
-      title: "Gratitude Jar",
-      description: "Daily gratitude diary to appreciate little things in life",
-      hasPlayButton: true,
     },
     {
       id: "proud-dandelion",
@@ -447,6 +447,49 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
               {/* Description */}
               <p className="text-sm text-muted-foreground leading-snug text-left">
                 Send a thank you note to someone special and spread joy
+              </p>
+            </motion.button>
+
+            {/* Gratitude Jar Card */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.55 }}
+              onClick={() => onExerciseClick("gratitude")}
+              className="group relative w-full flex flex-col rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all duration-300 overflow-hidden p-4 cursor-pointer"
+            >
+              {/* Badge in top right corner */}
+              <div className="absolute top-3 right-3 z-10">
+                <div className="w-8 h-8 flex items-center justify-center">
+                  <Image
+                    src="/icons/play.png"
+                    alt="Play"
+                    width={32}
+                    height={32}
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+
+              {/* Icon at top left */}
+              <div className="flex items-start justify-start mb-3 h-12">
+                <Image
+                  src="/icons/workout-icon_gratitude-jar.png"
+                  alt="Gratitude Jar"
+                  width={48}
+                  height={48}
+                  className="object-contain"
+                />
+              </div>
+
+              {/* Title */}
+              <h4 className="font-semibold text-base text-foreground group-hover:text-primary transition-colors mb-2 text-left">
+                Gratitude Jar
+              </h4>
+
+              {/* Description */}
+              <p className="text-sm text-muted-foreground leading-snug text-left">
+                Daily gratitude diary to appreciate little things in life
               </p>
             </motion.button>
           </div>
