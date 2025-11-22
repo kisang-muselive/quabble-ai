@@ -105,7 +105,7 @@ export function WellnessWelcomeCards({ onExerciseClick }: WellnessWelcomeCardsPr
       id: "gratitude",
       title: "Gratitude Jar",
       description: "Daily gratitude diary to appreciate little things in life",
-      isAppOnly: true,
+      hasPlayButton: true,
     },
     {
       id: "proud-dandelion",

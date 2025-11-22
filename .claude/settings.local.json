@@ -10,7 +10,11 @@
       "Bash(cat:*)",
       "Bash(npm run build:*)",
       "Bash(pnpm install:*)",
-      "Bash(pnpm add:*)"
+      "Bash(pnpm add:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(pnpm run dev:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)"
     ],
     "deny": [],
     "ask": []
