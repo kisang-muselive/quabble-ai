@@ -20,6 +20,7 @@ interface GratitudeEntry {
   x: number;
   y: number;
   rotation: number;
+  isNew?: boolean;
 }
 
 interface JarViewProps {
@@ -73,14 +74,30 @@ function JarView({
 
           {/* Render ornaments */}
           {gratitudeEntries.map((entry) => (
-            <div
+            <motion.div
               key={entry.id}
               className="absolute z-10"
               style={{
-                left: `50%`,
+                left: `${entry.x}px`,
                 top: `${entry.y}px`,
-                transform: `translate(calc(-50% + ${entry.x - 190}px), -50%) rotate(${entry.rotation}deg)`,
+                transform: `translate(-50%, -50%) rotate(${entry.rotation}deg)`,
               }}
+              initial={entry.isNew ? { opacity: 0, scale: 0.5 } : { opacity: 1, scale: 1 }}
+              animate={entry.isNew ? {
+                opacity: 1,
+                scale: 1,
+                filter: [
+                  "brightness(1) drop-shadow(0 0 0px rgba(255,215,0,0))",
+                  "brightness(1.5) drop-shadow(0 0 15px rgba(255,215,0,0.8))",
+                  "brightness(1.3) drop-shadow(0 0 10px rgba(255,215,0,0.6))",
+                  "brightness(1) drop-shadow(0 0 0px rgba(255,215,0,0))",
+                ]
+              } : { opacity: 1, scale: 1 }}
+              transition={entry.isNew ? {
+                opacity: { duration: 0.5 },
+                scale: { duration: 0.5 },
+                filter: { duration: 3, times: [0, 0.3, 0.7, 1] }
+              } : {}}
             >
               <Image
                 src={`/workouts/gratitudejar/gratitudejar_${entry.ornament}@3x.png`}
@@ -89,7 +106,7 @@ function JarView({
                 height={46}
                 className="object-contain"
               />
-            </div>
+            </motion.div>
           ))}
         </div>
 
@@ -129,12 +146,8 @@ export function GratitudeJarExercise({
   const [currentScreen, setCurrentScreen] = useState<ScreenType>("main");
   const [selectedOrnament, setSelectedOrnament] = useState<OrnamentType | null>(null);
   const [gratitudeText, setGratitudeText] = useState("");
-  const [gratitudeCount, setGratitudeCount] = useState(2);
-  const [gratitudeEntries, setGratitudeEntries] = useState<GratitudeEntry[]>([
-    // Initial ornaments - positioned at the bottom of the jar
-    { id: "1", ornament: "heart", text: "", x: 140, y: 380, rotation: 15 },
-    { id: "2", ornament: "fish", text: "", x: 230, y: 378, rotation: -20 },
-  ]);
+  const [gratitudeCount, setGratitudeCount] = useState(0);
+  const [gratitudeEntries, setGratitudeEntries] = useState<GratitudeEntry[]>([]);
 
   const handleStartWriting = () => {
     setCurrentScreen("ornamentSelection");
@@ -149,28 +162,35 @@ export function GratitudeJarExercise({
     if (gratitudeText.trim() && selectedOrnament) {
       const currentCount = gratitudeEntries.length;
 
-      // Fill horizontally first (3 ornaments per row), then stack upward
-      const ornamentsPerRow = 3;
+      // Fill horizontally first (4 ornaments per row), then stack upward
+      const ornamentsPerRow = 4;
       const rowIndex = Math.floor(currentCount / ornamentsPerRow);
       const columnIndex = currentCount % ornamentsPerRow;
 
-      // Calculate X position based on column (left, center, right)
-      let baseX: number;
-      if (columnIndex === 0) {
-        baseX = 130 + Math.random() * 35; // Left: 130-165
-      } else if (columnIndex === 1) {
-        baseX = 172 + Math.random() * 35; // Center: 172-207
-      } else {
-        baseX = 215 + Math.random() * 35; // Right: 215-250
-      }
+      // Calculate X position based on column (spread across jar width)
+      // Jar is 380px wide, center is at 190px, but shifted left slightly
+      // Spread ornaments with smaller width (reduced from 130 to 80)
+      const jarCenter = 175; // Shifted left from 190 to 175
+      const maxOffset = 80; // Maximum offset from center (reduced for smaller spread)
+      const minOffset = -80; // Minimum offset from center (reduced for smaller spread)
+      const totalSpread = maxOffset - minOffset; // 160px total spread
+      const columnSpacing = totalSpread / (ornamentsPerRow - 1); // Space between columns
+      
+      // Calculate offset from center for this column
+      const baseOffset = minOffset + (columnIndex * columnSpacing);
+      const randomOffset = Math.random() * 15 - 7.5; // -7.5 to +7.5px random variation
+      const finalOffset = baseOffset + randomOffset;
+      
+      // Store as absolute position (center + offset)
+      const baseX = jarCenter + finalOffset;
 
       const randomRotation = Math.random() * 40 - 20; // Random rotation -20 to 20 degrees
 
       // Calculate Y position - stack upward by row
       // Jar height is 520px, 20% from top is 104px, so limit is y >= 104
-      // Start at bottom (380) and go up by 35px per row
+      // Start higher (at 340 instead of 380) and go up by 40px per row
       const minY = 104; // 20% from top of 520px jar
-      const stackY = Math.max(minY, 380 - (rowIndex * 35));
+      const stackY = Math.max(minY, 340 - (rowIndex * 40));
 
       const entry: GratitudeEntry = {
         id: Date.now().toString(),
@@ -178,7 +198,8 @@ export function GratitudeJarExercise({
         text: gratitudeText,
         x: baseX,
         y: stackY,
-        rotation: randomRotation
+        rotation: randomRotation,
+        isNew: true
       };
 
       // Add entry immediately
@@ -187,6 +208,13 @@ export function GratitudeJarExercise({
       setGratitudeText("");
       setSelectedOrnament(null);
       setCurrentScreen("main");
+
+      // Remove the "isNew" flag after animation completes (3 seconds)
+      setTimeout(() => {
+        setGratitudeEntries(prev =>
+          prev.map(e => e.id === entry.id ? { ...e, isNew: false } : e)
+        );
+      }, 3000);
     }
   };
 
@@ -252,15 +280,31 @@ export function GratitudeJarExercise({
             </div>
 
             {/* Static ornaments inside the jar */}
-            {gratitudeEntries.slice(0, 5).map((entry) => (
-              <div
+            {gratitudeEntries.map((entry) => (
+              <motion.div
                 key={entry.id}
                 className="absolute z-10"
                 style={{
-                  left: `50%`,
+                  left: `${entry.x}px`,
                   top: `${entry.y}px`,
-                  transform: `translate(calc(-50% + ${entry.x - 190}px), -50%) rotate(${entry.rotation}deg)`,
+                  transform: `translate(-50%, -50%) rotate(${entry.rotation}deg)`,
                 }}
+                initial={entry.isNew ? { opacity: 0, scale: 0.5 } : { opacity: 1, scale: 1 }}
+                animate={entry.isNew ? {
+                  opacity: 1,
+                  scale: 1,
+                  filter: [
+                    "brightness(1) drop-shadow(0 0 0px rgba(255,215,0,0))",
+                    "brightness(1.5) drop-shadow(0 0 15px rgba(255,215,0,0.8))",
+                    "brightness(1.3) drop-shadow(0 0 10px rgba(255,215,0,0.6))",
+                    "brightness(1) drop-shadow(0 0 0px rgba(255,215,0,0))",
+                  ]
+                } : { opacity: 1, scale: 1 }}
+                transition={entry.isNew ? {
+                  opacity: { duration: 0.5 },
+                  scale: { duration: 0.5 },
+                  filter: { duration: 3, times: [0, 0.3, 0.7, 1] }
+                } : {}}
               >
                 <Image
                   src={`/workouts/gratitudejar/gratitudejar_${entry.ornament}@3x.png`}
@@ -269,7 +313,7 @@ export function GratitudeJarExercise({
                   height={46}
                   className="object-contain"
                 />
-              </div>
+              </motion.div>
             ))}
           </div>
 
@@ -367,10 +411,6 @@ export function GratitudeJarExercise({
               />
             </motion.button>
           </div>
-
-          <p className="text-sm text-gray-600 text-center">
-            Hard to think of any?
-          </p>
         </div>
       </div>
     );
@@ -397,39 +437,20 @@ export function GratitudeJarExercise({
         </button>
 
         <div className="relative z-10 flex flex-col items-start justify-start flex-1 px-6 py-8 w-full max-w-md pt-20">
-          {/* Selected ornament icons at the top */}
-          <div className="flex items-center gap-2 mb-6 w-full">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${selectedOrnament === "fish" ? "bg-gray-200" : "bg-transparent"}`}>
-              <Image
-                src={`/workouts/gratitudejar/gratitudejar_fish${selectedOrnament === "fish" ? "@3x" : "_disabled@3x"}.png`}
-                alt="Fish"
-                width={40}
-                height={40}
-                className="object-contain"
-              />
+          {/* Selected ornament icon at the top */}
+          {selectedOrnament && (
+            <div className="mb-6 w-full flex justify-start">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center">
+                <Image
+                  src={`/workouts/gratitudejar/gratitudejar_${selectedOrnament}@3x.png`}
+                  alt={selectedOrnament}
+                  width={64}
+                  height={64}
+                  className="object-contain"
+                />
+              </div>
             </div>
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${selectedOrnament === "heart" ? "bg-gray-200" : "bg-transparent"}`}>
-              <Image
-                src={`/workouts/gratitudejar/gratitudejar_heart${selectedOrnament === "heart" ? "@3x" : "_disabled@3x"}.png`}
-                alt="Heart"
-                width={40}
-                height={40}
-                className="object-contain"
-              />
-            </div>
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${selectedOrnament === "leaf" ? "bg-gray-200" : "bg-transparent"}`}>
-              <Image
-                src={`/workouts/gratitudejar/gratitudejar_leaf${selectedOrnament === "leaf" ? "@3x" : "_disabled@3x"}.png`}
-                alt="Leaf"
-                width={40}
-                height={40}
-                className="object-contain"
-              />
-            </div>
-            <span className="flex-1 text-right text-sm text-gray-600">
-              Hard to think of any?
-            </span>
-          </div>
+          )}
 
           <h2 className="text-lg font-normal mb-6 text-gray-900 w-full">
             What are you grateful for today?
@@ -441,7 +462,7 @@ export function GratitudeJarExercise({
               value={gratitudeText}
               onChange={(e) => setGratitudeText(e.target.value)}
               placeholder=""
-              className="w-full h-[300px] px-4 py-3 text-base border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-gray-600 text-gray-900 placeholder:text-gray-400 resize-none"
+              className="w-full h-[300px] px-4 py-3 text-base border-2 border-gray-300 rounded-lg bg-white focus:outline-none focus:border-gray-600 text-gray-900 placeholder:text-gray-400 resize-none"
               autoFocus
             />
           </div>
