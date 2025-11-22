@@ -184,7 +184,9 @@ export function GratitudeJarExercise({
       // Add entry immediately
       setGratitudeEntries(prev => [...prev, entry]);
       setGratitudeCount(prev => prev + 1);
-      setCurrentScreen("jarView");
+      setGratitudeText("");
+      setSelectedOrnament(null);
+      setCurrentScreen("main");
     }
   };
 
