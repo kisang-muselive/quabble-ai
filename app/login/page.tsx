@@ -41,10 +41,15 @@ export default function LoginPage() {
     setErrorMessage("");
 
     try {
+      // Get user's timezone
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
       // Try password signin endpoint
       const { data } = await api.post(API_ROUTE.PW_SIGNIN, {
         email: email,
         password: password,
+        identifier: "quabble:mobile",
+        timezone: timezone,
       });
 
       console.log("Login success:", data);

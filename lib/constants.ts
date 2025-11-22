@@ -13,9 +13,9 @@ export const API_ROUTE = {
   EMAIL_SEND_PW: "/wapi/auth/email/send/password",
   EMAIL_REGISTER_TYPE: "/wapi/auth/email/register-type",
 
-  PW_REGISTER: "/wapi/auth/register",
-  PW_SIGNIN: "/wapi/auth/signin",
-  UPDATE_PW: "/wapi/auth/password",
+  PW_REGISTER: "/api/auth/register",
+  PW_SIGNIN: "/api/auth/signin",
+  UPDATE_PW: "/api/auth/password",
 
   NUMBER_CHECK: "/wapi/auth/number/check",
   NUMBER_SEND: "/wapi/auth/number/send",
