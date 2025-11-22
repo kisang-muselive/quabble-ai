@@ -109,13 +109,6 @@ function JarView({
             </motion.div>
           ))}
         </div>
-
-        {/* Count badge */}
-        <div className="absolute bottom-20 flex items-center justify-center">
-          <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-md">
-            <span className="text-2xl font-semibold text-gray-800">{gratitudeCount}</span>
-          </div>
-        </div>
       </div>
 
       {/* Action Buttons */}
@@ -256,7 +249,7 @@ export function GratitudeJarExercise({
         </button>
 
         {/* Title and Description */}
-        <div className="absolute top-[10%] left-0 right-0 z-10 flex flex-col items-center px-6">
+        <div className="absolute top-[4%] md:top-[10%] left-0 right-0 z-10 flex flex-col items-center px-6">
           <h2 className="text-4xl font-normal mb-4 text-white text-center">
             Gratitude Jar
           </h2>
@@ -315,13 +308,6 @@ export function GratitudeJarExercise({
                 />
               </motion.div>
             ))}
-          </div>
-
-          {/* Count badge */}
-          <div className="absolute bottom-20 flex items-center justify-center">
-            <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-md">
-              <span className="text-2xl font-semibold text-gray-800">{gratitudeCount}</span>
-            </div>
           </div>
         </div>
 
