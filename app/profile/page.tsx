@@ -80,10 +80,6 @@ export default function ProfilePage() {
                     <p className="text-base">{authInfo.email || "N/A"}</p>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-muted-foreground">User ID</label>
-                    <p className="text-base">{authInfo.id || "N/A"}</p>
-                  </div>
-                  <div className="space-y-1">
                     <label className="text-sm font-medium text-muted-foreground">Phone Number</label>
                     <p className="text-base">{authInfo.number || "Not provided"}</p>
                   </div>
@@ -99,20 +95,8 @@ export default function ProfilePage() {
               <div className="bg-card border border-border rounded-lg p-6 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-muted-foreground">Avatar Type</label>
-                    <p className="text-base">{authInfo.avatarType}</p>
-                  </div>
-                  <div className="space-y-1">
                     <label className="text-sm font-medium text-muted-foreground">Timezone</label>
                     <p className="text-base">{authInfo.timezone || "N/A"}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium text-muted-foreground">Closeness</label>
-                    <p className="text-base capitalize">{authInfo.closeness || "N/A"}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium text-muted-foreground">User Type</label>
-                    <p className="text-base capitalize">{authInfo.userType || "N/A"}</p>
                   </div>
                 </div>
               </div>
@@ -175,10 +159,6 @@ export default function ProfilePage() {
               <h3 className="text-lg font-semibold">Account Metadata</h3>
               <div className="bg-card border border-border rounded-lg p-6 space-y-4">
                 <div className="space-y-4">
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium text-muted-foreground">UUID</label>
-                    <p className="text-base font-mono text-sm break-all">{authInfo.uuid || "N/A"}</p>
-                  </div>
                   <div className="space-y-1">
                     <label className="text-sm font-medium text-muted-foreground">Created At</label>
                     <p className="text-base">{formatDate(authInfo.createdAt)}</p>
