@@ -17,8 +17,10 @@ const instance = axios.create({
 
 // Request interceptor
 instance.interceptors.request.use((config) => {
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
+  // Always get the latest token in case it was updated
+  const token = getAccessToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
   return config;

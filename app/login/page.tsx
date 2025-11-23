@@ -5,11 +5,14 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
-import api, { ApiError, CustomApiErrorType, setAccessToken } from "@/lib/api";
-import { API_ROUTE, STORAGE_KEY } from "@/lib/constants";
+import api, { ApiError, CustomApiErrorType } from "@/lib/api";
+import { API_ROUTE } from "@/lib/constants";
+import { useAuthStore } from "@/lib/store/auth-store";
+import { AuthInfo } from "@/lib/types/auth";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { setAuthInfo } = useAuthStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -54,17 +57,28 @@ export default function LoginPage() {
 
       console.log("Login success:", data);
 
-      // Store auth info
-      if (data?.accessToken) {
-        setAccessToken(data.accessToken);
-      }
-
-      if (data?.refreshToken && typeof window !== "undefined") {
-        window.localStorage.setItem(STORAGE_KEY.REFRESH_TOKEN, data.refreshToken);
-      }
-
-      if (data?.email && typeof window !== "undefined") {
-        window.localStorage.setItem(STORAGE_KEY.EMAIL, data.email);
+      // Store all auth info in the store
+      if (data) {
+        const authInfo: AuthInfo = {
+          id: data.id || 0,
+          username: data.username || "",
+          avatarType: data.avatarType || 0,
+          timezone: data.timezone || "",
+          heart: data.heart || 0,
+          totalHeart: data.totalHeart || 0,
+          closeness: data.closeness || "",
+          isSubscribe: data.isSubscribe || false,
+          userType: data.userType || "",
+          uuid: data.uuid || "",
+          createdAt: data.createdAt || "",
+          email: data.email || "",
+          number: data.number || "",
+          accessToken: data.accessToken || "",
+          refreshToken: data.refreshToken || "",
+          sendbirdToken: data.sendbirdToken || "",
+          isExist: data.isExist || false,
+        };
+        setAuthInfo(authInfo);
       }
 
       // Redirect to main page on success

@@ -80,7 +80,7 @@ This application implements a complete email verification authentication flow:
 ### API Endpoints Used
 - `POST /api/auth/v3/signup` - Create new account and send verification email
 - `POST /api/auth/v3/verify-email` - Verify email token
-- `POST /wapi/auth/signin` - Login with email/password
+- `POST /api/auth/signin` - Login with email/password
 
 ## Project Structure
 

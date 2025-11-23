@@ -1,9 +1,21 @@
 export interface AuthInfo {
   id: number;
+  username: string;
+  avatarType: number;
+  timezone: string;
+  heart: number;
+  totalHeart: number;
+  closeness: string;
+  isSubscribe: boolean;
+  userType: string;
+  uuid: string;
+  createdAt: string;
   email: string;
-  username?: string;
+  number: string;
   accessToken: string;
   refreshToken: string;
+  sendbirdToken: string;
+  isExist: boolean;
 }
 
 export interface LoginResponse {

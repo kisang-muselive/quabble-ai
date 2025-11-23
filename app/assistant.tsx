@@ -19,8 +19,10 @@ import { RoutineCheckinModal } from "@/components/wellness/routine-checkin-modal
 import { AppOnlyModal } from "@/components/wellness/app-only-modal";
 import { Button } from "@/components/ui/button";
 import { ClipboardCheck } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LoginDropdown } from "@/components/auth/login-dropdown";
+import { UserDropdown } from "@/components/auth/user-dropdown";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 const AssistantContent = () => {
   const {
@@ -38,7 +40,14 @@ const AssistantContent = () => {
     closeAppOnlyModal,
   } = useWellness();
 
+  const { isAuthenticated, authInfo, loadAuthFromStorage } = useAuthStore();
   const [showLoginDropdown, setShowLoginDropdown] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+
+  // Load auth from storage on mount
+  useEffect(() => {
+    loadAuthFromStorage();
+  }, [loadAuthFromStorage]);
 
   const handleBreathingExercise = () => {
     openWellnessModal("breathing");
@@ -70,19 +79,36 @@ const AssistantContent = () => {
                 <span className="text-2xl font-semibold">Quabble</span>
               </div>
 
-              {/* Right side - Login button */}
+              {/* Right side - Login/User button */}
               <div className="ml-auto flex items-center gap-3 relative">
-                <Button
-                  onClick={() => setShowLoginDropdown(!showLoginDropdown)}
-                  variant="outline"
-                  size="sm"
-                  className="font-semibold"
-                >
-                  Log in
-                </Button>
-
-                {showLoginDropdown && (
-                  <LoginDropdown onClose={() => setShowLoginDropdown(false)} />
+                {isAuthenticated && authInfo?.username ? (
+                  <>
+                    <Button
+                      onClick={() => setShowUserDropdown(!showUserDropdown)}
+                      variant="outline"
+                      size="sm"
+                      className="font-semibold"
+                    >
+                      {authInfo.username}
+                    </Button>
+                    {showUserDropdown && (
+                      <UserDropdown onClose={() => setShowUserDropdown(false)} />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      onClick={() => setShowLoginDropdown(!showLoginDropdown)}
+                      variant="outline"
+                      size="sm"
+                      className="font-semibold"
+                    >
+                      Log in
+                    </Button>
+                    {showLoginDropdown && (
+                      <LoginDropdown onClose={() => setShowLoginDropdown(false)} />
+                    )}
+                  </>
                 )}
               </div>
 

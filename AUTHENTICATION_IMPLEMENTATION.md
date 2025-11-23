@@ -99,7 +99,7 @@ Redirect to main page
   - Response: Verification success/failure
 
 ### Login
-- `POST /wapi/auth/signin` - Authenticate user
+- `POST /api/auth/signin` - Authenticate user
   - Request: `{ email, password }`
   - Response: `{ id, email, username, accessToken, refreshToken }`
 
