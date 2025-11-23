@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import api, { ApiError, CustomApiErrorType } from "@/lib/api";
 import { API_ROUTE } from "@/lib/constants";
+import { useAuthStore } from "@/lib/store/auth-store";
+import { AuthInfo } from "@/lib/types/auth";
 
 const ANDROID_PACKAGE = "com.museLIVE.quabbleapp";
 const ANDROID_PLAY_URL = "https://play.google.com/store/apps/details?id=com.museLIVE.quabbleapp";
@@ -15,6 +17,7 @@ const IOS_APP_SCHEME = "quabbleapp://";
 function CongratsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { setAuthInfo } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
   const [isValidToken, setIsValidToken] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -38,6 +41,31 @@ function CongratsContent() {
         });
 
         console.log("Verify success:", data);
+
+        // Store all auth info in the store if data is available
+        if (data) {
+          const authInfo: AuthInfo = {
+            id: data.id || 0,
+            username: data.username || "",
+            avatarType: data.avatarType || 0,
+            timezone: data.timezone || "",
+            heart: data.heart || 0,
+            totalHeart: data.totalHeart || 0,
+            closeness: data.closeness || "",
+            isSubscribe: data.isSubscribe || false,
+            userType: data.userType || "",
+            uuid: data.uuid || "",
+            createdAt: data.createdAt || "",
+            email: data.email || "",
+            number: data.number || "",
+            accessToken: data.accessToken || "",
+            refreshToken: data.refreshToken || "",
+            sendbirdToken: data.sendbirdToken || "",
+            isExist: data.isExist || false,
+          };
+          setAuthInfo(authInfo);
+        }
+
         setIsValidToken(true);
         setErrorMessage("");
       } catch (err) {
@@ -213,23 +241,23 @@ function CongratsContent() {
               Your account is now active and ready to use.
             </p>
             <p className="text-sm text-muted-foreground">
-              Please log in to continue your wellness journey.
+              Start your wellness journey with Quabble.
             </p>
           </div>
 
           <div className="space-y-3 pt-4">
             <Button
-              onClick={openQuabbleApp}
+              onClick={() => router.push("/")}
               className="w-full h-12 text-base font-semibold"
             >
-              Open Quabble App
+              Get Started
             </Button>
             <Button
-              onClick={() => router.push("/login")}
+              onClick={openQuabbleApp}
               variant="outline"
               className="w-full h-12 text-base font-semibold"
             >
-              Continue to login
+              Open Quabble App
             </Button>
           </div>
 
