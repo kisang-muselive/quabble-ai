@@ -38,6 +38,7 @@ function JarView({
   onWriteAnother,
   onBackToJar,
 }: JarViewProps) {
+  const [selectedEntry, setSelectedEntry] = useState<GratitudeEntry | null>(null);
 
   return (
     <div
@@ -74,9 +75,9 @@ function JarView({
 
           {/* Render ornaments */}
           {gratitudeEntries.map((entry) => (
-            <motion.div
+            <motion.button
               key={entry.id}
-              className="absolute z-10"
+              className="absolute z-10 cursor-pointer"
               style={{
                 left: `${entry.x}px`,
                 top: `${entry.y}px`,
@@ -93,21 +94,54 @@ function JarView({
                   "brightness(1) drop-shadow(0 0 0px rgba(255,215,0,0))",
                 ]
               } : { opacity: 1, scale: 1 }}
+              whileHover={{ scale: 1.3 }}
               transition={entry.isNew ? {
                 opacity: { duration: 0.5 },
                 scale: { duration: 0.5 },
                 filter: { duration: 3, times: [0, 0.3, 0.7, 1] }
-              } : {}}
+              } : {
+                scale: { duration: 0.2 }
+              }}
+              onClick={() => setSelectedEntry(entry)}
             >
               <Image
                 src={`/workouts/gratitudejar/gratitudejar_${entry.ornament}@3x.png`}
                 alt={entry.ornament}
                 width={46}
                 height={46}
-                className="object-contain"
+                className="object-contain pointer-events-none"
               />
-            </motion.div>
+            </motion.button>
           ))}
+          
+          {/* Gratitude Message Popover - rendered inside jar container but above jar SVG */}
+          {selectedEntry && (
+            <div 
+              className="absolute z-[30] w-72 bg-white rounded-lg shadow-2xl border border-gray-200"
+              style={{
+                left: `${selectedEntry.x}px`,
+                top: `${selectedEntry.y + 30}px`,
+                transform: 'translateX(-50%)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative p-4">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedEntry(null);
+                  }}
+                  className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors z-10"
+                  aria-label="Close"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+                <p className="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap pr-6">
+                  {selectedEntry.text}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -129,6 +163,14 @@ function JarView({
           Back to Jar
         </Button>
       </div>
+
+      {/* Click outside to close overlay */}
+      {selectedEntry && (
+        <div 
+          className="fixed inset-0 z-40"
+          onClick={() => setSelectedEntry(null)}
+        />
+      )}
     </div>
   );
 }
@@ -141,6 +183,7 @@ export function GratitudeJarExercise({
   const [gratitudeText, setGratitudeText] = useState("");
   const [gratitudeCount, setGratitudeCount] = useState(0);
   const [gratitudeEntries, setGratitudeEntries] = useState<GratitudeEntry[]>([]);
+  const [selectedEntry, setSelectedEntry] = useState<GratitudeEntry | null>(null);
 
   const handleStartWriting = () => {
     setCurrentScreen("ornamentSelection");
@@ -274,9 +317,9 @@ export function GratitudeJarExercise({
 
             {/* Static ornaments inside the jar */}
             {gratitudeEntries.map((entry) => (
-              <motion.div
+              <motion.button
                 key={entry.id}
-                className="absolute z-10"
+                className="absolute z-10 cursor-pointer"
                 style={{
                   left: `${entry.x}px`,
                   top: `${entry.y}px`,
@@ -293,21 +336,54 @@ export function GratitudeJarExercise({
                     "brightness(1) drop-shadow(0 0 0px rgba(255,215,0,0))",
                   ]
                 } : { opacity: 1, scale: 1 }}
+                whileHover={{ scale: 1.3 }}
                 transition={entry.isNew ? {
                   opacity: { duration: 0.5 },
                   scale: { duration: 0.5 },
                   filter: { duration: 3, times: [0, 0.3, 0.7, 1] }
-                } : {}}
+                } : {
+                  scale: { duration: 0.2 }
+                }}
+                onClick={() => setSelectedEntry(entry)}
               >
                 <Image
                   src={`/workouts/gratitudejar/gratitudejar_${entry.ornament}@3x.png`}
                   alt={entry.ornament}
                   width={46}
                   height={46}
-                  className="object-contain"
+                  className="object-contain pointer-events-none"
                 />
-              </motion.div>
+              </motion.button>
             ))}
+            
+            {/* Gratitude Message Popover - rendered inside jar container but above jar SVG */}
+            {selectedEntry && (
+              <div 
+                className="absolute z-[30] w-72 bg-white rounded-lg shadow-2xl border border-gray-200"
+                style={{
+                  left: `${selectedEntry.x}px`,
+                  top: `${selectedEntry.y + 30}px`,
+                  transform: 'translateX(-50%)',
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="relative p-4">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedEntry(null);
+                    }}
+                    className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors z-10"
+                    aria-label="Close"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                  <p className="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap pr-6">
+                    {selectedEntry.text}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -321,6 +397,14 @@ export function GratitudeJarExercise({
             Write Gratitude
           </Button>
         </div>
+
+        {/* Click outside to close overlay */}
+        {selectedEntry && (
+          <div 
+            className="fixed inset-0 z-40"
+            onClick={() => setSelectedEntry(null)}
+          />
+        )}
       </div>
     );
   }
